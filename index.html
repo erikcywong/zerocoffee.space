@@ -1,0 +1,1840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ZCC — ZeroCarbon Coffee Capital Stack</title>
+<style>
+  :root{
+    --bg:#000000;
+    --panel:#16181c;
+    --panel2:#0e1013;
+    --line:#2f3336;
+    --line-soft:#1e2124;
+    --text:#e7e9ea;
+    --muted:#71767b;
+    --accent:#1d9bf0;
+    --accent-dim:rgba(29,155,240,.12);
+    --up:#00ba7c;
+    --down:#f4212e;
+    --amber:#ffd400;
+    --coffee:#c8873f;
+    --radius:16px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg)}
+  body{
+    color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased;
+  }
+  html[dir="rtl"] body{font-family:"Segoe UI",Tahoma,Arial,sans-serif}
+  a{color:inherit;text-decoration:none}
+  h1,h2,h3,h4{margin:0 0 .4em;line-height:1.15;letter-spacing:-.02em}
+  h1{font-size:clamp(30px,4.2vw,50px);font-weight:800}
+  h2{font-size:clamp(21px,2.4vw,28px);font-weight:750}
+  h3{font-size:16px;font-weight:700}
+  p{margin:0 0 1em}
+  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px}
+  .muted{color:var(--muted)}
+  .small{font-size:13px}
+
+  /* ---------- floating nav ---------- */
+  .navwrap{position:fixed;top:14px;left:0;right:0;z-index:100;display:flex;justify-content:center;padding:0 16px;pointer-events:none}
+  nav.top{
+    pointer-events:auto;display:flex;align-items:center;gap:6px;
+    background:rgba(22,24,28,.82);backdrop-filter:blur(18px) saturate(150%);
+    border:1px solid var(--line);border-radius:99px;
+    padding:7px 10px 7px 16px;max-width:100%;
+    box-shadow:0 8px 32px rgba(0,0,0,.55);
+  }
+  .brand{display:flex;align-items:center;gap:9px;font-weight:800;letter-spacing:-.02em;margin-right:10px;white-space:nowrap}
+  .brand .dot{
+    width:24px;height:24px;border-radius:8px;flex:none;
+    background:linear-gradient(135deg,var(--accent) 0%,#0f5c96 60%,var(--coffee) 130%);
+    position:relative;
+  }
+  .brand .dot::after{content:"";position:absolute;inset:7px 7px auto auto;width:6px;height:6px;border-radius:50%;background:var(--up)}
+  nav.top .links{display:flex;align-items:center;gap:2px}
+  nav.top a.lk{
+    padding:7px 13px;border-radius:99px;font-size:13.5px;font-weight:600;color:var(--muted);
+    white-space:nowrap;transition:.15s;
+  }
+  nav.top a.lk:hover{background:rgba(231,233,234,.08);color:var(--text)}
+  nav.top a.lk.on{color:var(--accent);background:var(--accent-dim)}
+
+  /* hover dropdown */
+  .dd{position:relative}
+  .dd>.lk{cursor:pointer;display:inline-flex;align-items:center;gap:5px}
+  .dd>.lk::after{content:"";border:4px solid transparent;border-top-color:currentColor;margin-top:5px}
+  .dd-menu{
+    position:absolute;top:calc(100% + 10px);left:50%;transform:translateX(-50%) translateY(6px);
+    background:var(--panel);border:1px solid var(--line);border-radius:14px;
+    min-width:230px;padding:8px;opacity:0;visibility:hidden;transition:.16s;
+    box-shadow:0 16px 48px rgba(0,0,0,.65);
+  }
+  .dd:hover .dd-menu{opacity:1;visibility:visible;transform:translateX(-50%) translateY(0)}
+  .dd-menu a{
+    display:flex;flex-direction:column;gap:1px;padding:9px 12px;border-radius:10px;transition:.12s;
+  }
+  .dd-menu a:hover{background:rgba(231,233,234,.07)}
+  .dd-menu a b{font-size:13.5px;font-weight:650;color:var(--text)}
+  .dd-menu a span{font-size:11.5px;color:var(--muted)}
+  .dd-menu a.on{background:var(--accent-dim)}
+  .dd-menu a.on b{color:var(--accent)}
+
+  .nav-cta{
+    background:var(--accent);color:#fff;padding:8px 17px;border-radius:99px;
+    font-size:13.5px;font-weight:700;white-space:nowrap;margin-left:8px;transition:.15s;
+  }
+  .nav-cta:hover{background:#1a8cd8}
+
+  main{max-width:1180px;margin:0 auto;padding:96px 20px 90px}
+  .page{display:none;animation:fade .25s ease}
+  .page.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+  /* ---------- RTL ---------- */
+  [dir="rtl"] .timeline{padding-left:0;padding-right:22px}
+  [dir="rtl"] .timeline::before{left:auto;right:5px}
+  [dir="rtl"] .tl::before{left:auto;right:-22px}
+  [dir="rtl"] .note{border-left:none;border-right:3px solid var(--accent)}
+  [dir="rtl"] .note.warn{border-right-color:var(--amber)}
+  [dir="rtl"] .note.danger{border-right-color:var(--down)}
+  [dir="rtl"] .brand .dot::after{inset:7px auto auto 7px}
+  [dir="rtl"] .dd-menu{left:auto;right:50%;transform:translateX(50%) translateY(6px)}
+  [dir="rtl"] .dd:hover .dd-menu{transform:translateX(50%) translateY(0)}
+  [dir="rtl"] .nav-cta{margin-left:0;margin-right:8px}
+
+  /* ---------- atoms ---------- */
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:8px;font-size:11.5px;font-weight:700;
+    letter-spacing:.14em;text-transform:uppercase;color:var(--accent);
+    background:var(--accent-dim);border:1px solid rgba(29,155,240,.3);
+    padding:5px 13px;border-radius:99px;margin-bottom:18px;
+  }
+  .btn{
+    display:inline-flex;align-items:center;gap:8px;padding:11px 21px;border-radius:99px;
+    font-weight:700;font-size:14px;border:1px solid transparent;cursor:pointer;transition:.15s;font-family:inherit;
+  }
+  .btn.primary{background:var(--accent);color:#fff}
+  .btn.primary:hover{background:#1a8cd8}
+  .btn.ghost{background:transparent;border-color:var(--line);color:var(--text)}
+  .btn.ghost:hover{background:rgba(231,233,234,.08)}
+  .btn.sm{padding:6px 14px;font-size:12.5px}
+
+  .card{
+    background:var(--panel);border:1px solid var(--line-soft);border-radius:var(--radius);
+    padding:22px;transition:.18s;
+  }
+  .card:hover{border-color:var(--line)}
+  .grid{display:grid;gap:14px}
+  .g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+  @media(max-width:920px){.g4{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:1fr}}
+  @media(max-width:640px){.g2,.g4{grid-template-columns:1fr}}
+
+  .tag{
+    display:inline-block;font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;
+    background:rgba(231,233,234,.08);color:var(--text);border:1px solid var(--line);
+  }
+  .tag.blue{background:var(--accent-dim);color:var(--accent);border-color:rgba(29,155,240,.35)}
+  .tag.green{background:rgba(0,186,124,.12);color:var(--up);border-color:rgba(0,186,124,.35)}
+  .tag.amber{background:rgba(255,212,0,.1);color:var(--amber);border-color:rgba(255,212,0,.3)}
+  .tag.red{background:rgba(244,33,46,.1);color:var(--down);border-color:rgba(244,33,46,.35)}
+
+  .stat{padding:20px}
+  .stat .n{font-size:28px;font-weight:800;letter-spacing:-.03em;color:var(--text)}
+  .stat .n em{font-style:normal;color:var(--accent)}
+  .stat .l{font-size:12.5px;color:var(--muted);font-weight:600;margin-top:3px}
+
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  th{
+    text-align:start;font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--muted);font-weight:700;padding:0 12px 10px;border-bottom:1px solid var(--line);
+  }
+  td{padding:12px;border-bottom:1px solid var(--line-soft);vertical-align:middle}
+  tbody tr:hover{background:rgba(231,233,234,.03)}
+
+  .bar{height:6px;background:var(--line-soft);border-radius:99px;overflow:hidden}
+  .bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),#6cc4ff);border-radius:99px}
+
+  .divider{height:1px;background:var(--line-soft);margin:36px 0}
+
+  .note{
+    border-left:3px solid var(--accent);background:var(--accent-dim);
+    padding:14px 18px;border-radius:0 12px 12px 0;font-size:13.5px;
+  }
+  .note.warn{border-left-color:var(--amber);background:rgba(255,212,0,.07)}
+  .note.danger{border-left-color:var(--down);background:rgba(244,33,46,.07)}
+
+  /* ---------- hero ---------- */
+  .hero{padding:26px 0 10px;max-width:860px}
+  .hero p{font-size:17px;color:var(--muted);max-width:680px}
+  .hero h1 .hl{color:var(--accent)}
+  .ctas{display:flex;gap:10px;flex-wrap:wrap;margin-top:26px}
+
+  /* ---------- capital stack ---------- */
+  .stack{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:20px}
+  @media(max-width:860px){.stack{grid-template-columns:1fr}}
+  .layer{
+    background:linear-gradient(180deg,var(--panel) 0%,var(--panel2) 100%);
+    border:1px solid var(--line-soft);border-radius:var(--radius);padding:20px;
+    position:relative;transition:.18s;cursor:pointer;overflow:hidden;
+  }
+  .layer::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:var(--accent);opacity:0;transition:.18s}
+  .layer:hover{transform:translateY(-4px);border-color:rgba(29,155,240,.4)}
+  .layer:hover::before{opacity:1}
+  .layer .num{
+    font-size:10.5px;font-weight:800;letter-spacing:.12em;color:var(--accent);
+    background:var(--accent-dim);display:inline-block;padding:3px 9px;border-radius:6px;margin-bottom:12px;
+  }
+  .layer h3{margin-bottom:5px;font-size:15.5px}
+  .layer p{font-size:12.8px;color:var(--muted);margin:0}
+
+  /* ---------- project cards ---------- */
+  .pcard{
+    background:var(--panel);border:1px solid var(--line-soft);border-radius:var(--radius);
+    padding:20px;transition:.18s;display:flex;flex-direction:column;gap:11px;
+  }
+  .pcard:hover{transform:translateY(-3px);border-color:rgba(29,155,240,.4)}
+  .pcard h3{font-size:15px;margin:0}
+  .pcard .desc{font-size:13px;color:var(--muted);margin:0;min-height:40px}
+  .pcard .meta{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);font-weight:600}
+
+  /* ---------- tabs ---------- */
+  .tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin:24px 0 20px;overflow-x:auto;scrollbar-width:none}
+  .tabs::-webkit-scrollbar{display:none}
+  .tab{
+    background:none;border:none;font-family:inherit;font-size:14px;font-weight:650;color:var(--muted);
+    padding:10px 15px;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:.15s;
+  }
+  .tab:hover{color:var(--text)}
+  .tab.on{color:var(--accent);border-bottom-color:var(--accent)}
+  .pane{display:none}
+  .pane.on{display:block;animation:fade .18s ease}
+
+  /* ---------- chips ---------- */
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 10px}
+  .chip{
+    background:transparent;border:1px solid var(--line);border-radius:99px;padding:6px 14px;
+    font-size:12.5px;font-weight:600;color:var(--muted);cursor:pointer;transition:.15s;font-family:inherit;
+  }
+  .chip:hover{border-color:var(--accent);color:var(--text)}
+  .chip.on{background:var(--accent);border-color:var(--accent);color:#fff}
+
+  /* ---------- forms ---------- */
+  label.f{display:block;font-size:12px;font-weight:700;color:var(--muted);margin:0 0 6px;letter-spacing:.03em}
+  input[type=text],input[type=number],select,textarea{
+    width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:11px;
+    font-family:inherit;font-size:14px;background:var(--panel2);color:var(--text);outline:none;transition:.15s;
+  }
+  input::placeholder{color:#4a4f54}
+  input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
+  .field{margin-bottom:16px}
+  .steps{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px}
+  .step{
+    display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:650;color:var(--muted);
+    background:transparent;border:1px solid var(--line);padding:7px 14px;border-radius:99px;
+  }
+  .step b{background:var(--line-soft);color:var(--muted);width:19px;height:19px;border-radius:50%;
+    display:grid;place-items:center;font-size:11px}
+  .step.on{color:var(--accent);border-color:rgba(29,155,240,.4);background:var(--accent-dim)}
+  .step.on b{background:var(--accent);color:#fff}
+
+  /* ---------- ledger ---------- */
+  .ledger-eq{
+    display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:16px 20px;
+    background:var(--panel);border:1px solid var(--line-soft);border-radius:var(--radius);
+    font-size:13px;margin-bottom:18px;
+  }
+  .ledger-eq .k{font-weight:750;color:var(--accent)}
+  .ledger-eq .op{color:var(--muted);font-weight:700;font-size:16px}
+  .ledger-eq .mono{color:var(--text);font-weight:600}
+
+  .conn{display:flex;align-items:center;gap:10px;padding:13px 16px;border:1px solid var(--line-soft);border-radius:11px;background:var(--panel2)}
+  .pulse{width:9px;height:9px;border-radius:50%;background:var(--up);box-shadow:0 0 0 0 rgba(0,186,124,.6);animation:p 2s infinite;flex:none}
+  .pulse.gray{background:#536471;animation:none}
+  .pulse.amber{background:var(--amber);box-shadow:0 0 0 0 rgba(255,212,0,.5);animation:p 2s infinite}
+  @keyframes p{0%{box-shadow:0 0 0 0 rgba(0,186,124,.5)}70%{box-shadow:0 0 0 9px rgba(0,186,124,0)}100%{box-shadow:0 0 0 0 rgba(0,186,124,0)}}
+
+  .timeline{position:relative;padding-left:22px}
+  .timeline::before{content:"";position:absolute;left:5px;top:6px;bottom:6px;width:2px;background:var(--line)}
+  .tl{position:relative;margin-bottom:18px}
+  .tl::before{content:"";position:absolute;left:-22px;top:5px;width:10px;height:10px;border-radius:50%;
+    background:var(--bg);border:2px solid var(--accent)}
+  .tl.done::before{background:var(--up);border-color:var(--up)}
+  .tl .when{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+  .tl p{margin:2px 0 0;font-size:13.5px}
+
+  .breadcrumb{font-size:12.5px;color:var(--muted);margin-bottom:14px}
+  .breadcrumb a:hover{color:var(--accent)}
+
+  footer{border-top:1px solid var(--line-soft);padding:28px 20px;text-align:center;color:var(--muted);font-size:12.5px}
+</style>
+</head>
+<body>
+
+<div class="navwrap">
+  <nav class="top">
+    <a class="brand" href="#/home"><span class="dot"></span> ZCC</a>
+    <div class="links">
+      <a class="lk" href="#/home" data-i18n="nav_home">Home</a>
+      <a class="lk" href="#/discover" data-i18n="nav_discover">Discover</a>
+      <a class="lk" href="#/how" data-i18n="nav_how">How it works</a>
+      <a class="lk" href="#/carbon" data-i18n="nav_carbon">Carbon method</a>
+      <div class="dd">
+        <a class="lk" data-i18n="nav_portals">Portals</a>
+        <div class="dd-menu">
+          <a href="#/founder"><b data-i18n="nav_founder">Founder</b><span data-i18n="nav_founder_s">Launch and manage raises</span></a>
+          <a href="#/investor"><b data-i18n="nav_investor">Investor</b><span data-i18n="nav_investor_s">Portfolio &amp; carbon rights</span></a>
+          <a href="#/institution"><b data-i18n="nav_institution">Institution</b><span data-i18n="nav_institution_s">Carbon ledger &amp; forwards</span></a>
+          <a href="#/vvb"><b data-i18n="nav_vvb">VVB</b><span data-i18n="nav_vvb_s">Verification queue</span></a>
+          <a href="#/admin"><b data-i18n="nav_admin">Admin</b><span data-i18n="nav_admin_s">Registry ops &amp; compliance</span></a>
+        </div>
+      </div>
+      <div class="dd" id="langdd">
+        <a class="lk" id="langbtn">EN</a>
+        <div class="dd-menu" style="min-width:150px">
+          <a data-lang="en"><b>English</b></a>
+          <a data-lang="zh"><b>中文（简体）</b></a>
+          <a data-lang="ar"><b>العربية</b></a>
+        </div>
+      </div>
+    </div>
+    <a class="nav-cta" href="#/founder/new" data-i18n="nav_raise">Raise</a>
+  </nav>
+</div>
+
+<main>
+
+<!-- ============================ HOME ============================ -->
+<section id="page-home" class="page active">
+  <div class="hero">
+    <span class="eyebrow" data-i18n="h_eye">ZeroCarbon Coffee Capital Stack</span>
+    <h1 data-i18n="h_h1">From a coffee bean's carbon baseline<br>to an <span class="hl">exit-ready capital stack</span>.</h1>
+    <p data-i18n="h_p">Incubate on JebiStarter. Raise with your community. Bring in institutional capital. Bind verifiable carbon rights to every investment — then retire them on the registry, once, and never twice.</p>
+    <div class="ctas">
+      <a class="btn primary" href="#/discover" data-i18n="h_cta1">Browse projects</a>
+      <a class="btn ghost" href="#/how" data-i18n="h_cta2">How it works</a>
+      <a class="btn ghost" href="#/carbon" data-i18n="h_cta3">Carbon method</a>
+    </div>
+  </div>
+
+  <div class="grid g4" style="margin:38px 0 8px">
+    <div class="card stat"><div class="n">142</div><div class="l" data-i18n="h_s1">Projects onboarded</div></div>
+    <div class="card stat"><div class="n"><em>$86.4M</em></div><div class="l" data-i18n="h_s2">Capital closed</div></div>
+    <div class="card stat"><div class="n">214,000</div><div class="l" data-i18n="h_s3">tCO₂e verified</div></div>
+    <div class="card stat"><div class="n" style="color:var(--up)">61,800</div><div class="l" data-i18n="h_s4">tCO₂e retired</div></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2 data-i18n="h_stack_t">The four-layer capital stack</h2>
+  <p class="muted" style="max-width:640px" data-i18n="h_stack_p">Every project carries the same carbon identity from incubation to exit. Click a layer to see its rules, typical raise size and fee structure.</p>
+
+  <div class="stack">
+    <a class="layer" href="#/how">
+      <span class="num" data-i18n="h_l1n">LAYER 01</span>
+      <h3 data-i18n="h_l1t">Incubate</h3>
+      <p data-i18n="h_l1p">JebiStarter-style onboarding. Milestones, simplified carbon baseline, community pre-warming. No money moves yet.</p>
+    </a>
+    <a class="layer" href="#/how">
+      <span class="num" data-i18n="h_l2n">LAYER 02</span>
+      <h3 data-i18n="h_l2t">Community raise</h3>
+      <p data-i18n="h_l2p">Reg CF-style issuance and SPVs. Fans and local backers subscribe through an escrow, funded only on close.</p>
+    </a>
+    <a class="layer" href="#/how">
+      <span class="num" data-i18n="h_l3n">LAYER 03</span>
+      <h3 data-i18n="h_l3t">Institutional capital</h3>
+      <p data-i18n="h_l3p">Jebi Capital-style funds, data rooms, capital calls, carry waterfalls and exit distribution.</p>
+    </a>
+    <a class="layer" href="#/how">
+      <span class="num" data-i18n="h_l4n">LAYER 04</span>
+      <h3 data-i18n="h_l4t">Carbon rights</h3>
+      <p data-i18n="h_l4p">MRV, VVB verification, registry issuance, entitlement allocation, retirement and disclosure packs.</p>
+    </a>
+  </div>
+
+  <div class="divider"></div>
+
+  <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap">
+    <div>
+      <h2 style="margin-bottom:4px" data-i18n="h_ft">Featured projects</h2>
+      <p class="muted small" style="margin:0" data-i18n="h_fs">Live across all three capital layers.</p>
+    </div>
+    <a class="btn ghost sm" href="#/discover" data-i18n="h_viewall">View all 142 →</a>
+  </div>
+
+  <div class="grid g3" style="margin-top:18px">
+    <a class="pcard" href="#/project">
+      <div style="display:flex;gap:6px;flex-wrap:wrap"><span class="tag green" data-i18n="t_regen">Regenerative</span><span class="tag blue" data-i18n="t_removal">Removal</span></div>
+      <h3>Kilimanjaro Regenerative Coffee Cooperative</h3>
+      <p class="desc" data-i18n="h_c1d">Agroforestry and soil-carbon transition across 2,400 smallholder farms in northern Tanzania.</p>
+      <div class="bar"><i style="width:72%"></i></div>
+      <div class="meta"><span>$864,000 / $1.2M</span><span style="color:var(--up)" data-i18n="st_verified">Carbon: Verified</span></div>
+    </a>
+    <a class="pcard" href="#/project">
+      <div style="display:flex;gap:6px;flex-wrap:wrap"><span class="tag amber" data-i18n="t_process">Processing</span><span class="tag blue" data-i18n="t_avoid">Avoidance</span></div>
+      <h3>Huila Wet-Mill Methane Capture</h3>
+      <p class="desc" data-i18n="h_c2d">Wastewater methane recovery and solar drying for a mid-size cooperative wet mill in Colombia.</p>
+      <div class="bar"><i style="width:45%"></i></div>
+      <div class="meta"><span>$540,000 / $1.2M</span><span style="color:var(--amber)" data-i18n="st_est">Carbon: Estimated</span></div>
+    </a>
+    <a class="pcard" href="#/project">
+      <div style="display:flex;gap:6px;flex-wrap:wrap"><span class="tag" data-i18n="t_roast">Roastery</span><span class="tag green" data-i18n="t_inset">Inset</span></div>
+      <h3>Ember Roastery Electrification</h3>
+      <p class="desc" data-i18n="h_c3d">Heat-pump roastery retrofit with a consumer subscription model and open carbon ledger.</p>
+      <div class="bar"><i style="width:88%"></i></div>
+      <div class="meta"><span>$1.06M / $1.2M</span><span style="color:var(--up)" data-i18n="st_verified">Carbon: Verified</span></div>
+    </a>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="grid g2">
+    <div class="card">
+      <h3 data-i18n="h_nb_t">Investing is not buying carbon</h3>
+      <p class="small muted" style="margin-bottom:14px" data-i18n="h_nb_s">The single most misunderstood thing about this platform, stated plainly.</p>
+      <p class="small" data-i18n="h_nb_p">Equity does not generate carbon credits. A carbon asset only exists once a reduction or removal is <b>additional, measured, third-party verified, registered and transferred or retired</b> on a registry.</p>
+      <a class="btn ghost sm" href="#/carbon" data-i18n="h_nb_btn">Read the method →</a>
+    </div>
+    <div class="card">
+      <h3 data-i18n="h_fw_t">Double-counting firewall</h3>
+      <p class="small muted" style="margin-bottom:14px" data-i18n="h_fw_s">Enforced at the ledger level, not in a policy PDF.</p>
+      <p class="small" data-i18n="h_fw_p">Every verified tonne carries exactly one use tag: <span class="tag" data-i18n="t_scope3">Scope 3 inset</span> <span class="tag blue" data-i18n="t_offset">Offset retirement</span> <span class="tag amber" data-i18n="t_held">Held</span> <span class="tag green" data-i18n="t_avail">Available</span>. Switching a tag requires a re-validation workflow.</p>
+      <a class="btn ghost sm" href="#/institution" data-i18n="h_fw_btn">Open carbon ledger →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ DISCOVER ============================ -->
+<section id="page-discover" class="page">
+  <h1 data-i18n="d_h1">Discover projects</h1>
+  <p class="muted" style="max-width:620px" data-i18n="d_p">Filter by value-chain stage, capital layer and carbon project type. Carbon status is shown before you invest — never after.</p>
+
+  <div class="chips">
+    <button class="chip on" data-i18n="d_all_st">All stages</button>
+    <button class="chip" data-i18n="t_farm">Farming</button>
+    <button class="chip" data-i18n="t_process">Processing</button>
+    <button class="chip" data-i18n="t_roasting">Roasting</button>
+    <button class="chip" data-i18n="t_pack">Packaging</button>
+    <button class="chip" data-i18n="t_log">Logistics</button>
+    <button class="chip" data-i18n="t_cafe">Café</button>
+  </div>
+  <div class="chips" style="margin-top:0">
+    <button class="chip on" data-i18n="d_all_ly">All layers</button>
+    <button class="chip" data-i18n="d_inc">Incubation</button>
+    <button class="chip" data-i18n="d_com">Community</button>
+    <button class="chip" data-i18n="d_inst">Institutional</button>
+    <button class="chip" data-i18n="d_cver">Carbon verified</button>
+  </div>
+
+  <div class="grid g3">
+    <a class="pcard" href="#/project">
+      <div style="display:flex;gap:6px;flex-wrap:wrap"><span class="tag green" data-i18n="t_regen">Regenerative</span><span class="tag blue" data-i18n="t_removal">Removal</span></div>
+      <h3>Kilimanjaro Regenerative Coffee Cooperative</h3>
+      <p class="desc" data-i18n="d_c1d">Agroforestry and soil-carbon transition across 2,400 smallholder farms.</p>
+      <div class="bar"><i style="width:72%"></i></div>
+      <div class="meta"><span>$864,000 / $1.2M</span><span style="color:var(--up)" data-i18n="st_verified">Carbon: Verified</span></div>
+    </a>
+    <a class="pcard" href="#/project">
+      <div style="display:flex;gap:6px;flex-wrap:wrap"><span class="tag amber" data-i18n="t_process">Processing</span><span class="tag blue" data-i18n="t_avoid">Avoidance</span></div>
+      <h3>Huila Wet-Mill Methane Capture</h3>
+      <p class="desc" data-i18n="d_c2d">Wastewater methane recovery and solar drying in Huila, Colombia.</p>
+      <div class="bar"><i style="width:45%"></i></div>
+      <div class="meta"><span>$540,000 / $1.2M</span><span style="color:var(--amber)" data-i18n="st_est">Carbon: Estimated</span></div>
+    </a>
+    <a class="pcard" href="#/project">
+      <div style="display:flex;gap:6px;flex-wrap:wrap"><span class="tag" data-i18n="t_roast">Roastery</span><span class="tag green" data-i18n="t_inset">Inset</span></div>
+      <h3>Ember Roastery Electrification</h3>
+      <p class="desc" data-i18n="d_c3d">Heat-pump roastery retrofit with a consumer subscription model.</p>
+      <div class="bar"><i style="width:88%"></i></div>
+      <div class="meta"><span>$1.06M / $1.2M</span><span style="color:var(--up)" data-i18n="st_verified">Carbon: Verified</span></div>
+    </a>
+    <a class="pcard" href="#/project">
+      <div style="display:flex;gap:6px;flex-wrap:wrap"><span class="tag" data-i18n="t_pack">Packaging</span><span class="tag amber" data-i18n="st_notstarted">Not started</span></div>
+      <h3>Reusable Loop Packaging Co.</h3>
+      <p class="desc" data-i18n="d_c4d">Returnable container system for specialty café chains in Southeast Asia.</p>
+      <div class="bar"><i style="width:18%"></i></div>
+      <div class="meta"><span>$90,000 / $500,000</span><span data-i18n="st_notstarted">Not started</span></div>
+    </a>
+    <a class="pcard" href="#/project">
+      <div style="display:flex;gap:6px;flex-wrap:wrap"><span class="tag amber" data-i18n="t_log">Logistics</span><span class="tag blue" data-i18n="t_avoid">Avoidance</span></div>
+      <h3>Andes Green Freight Corridor</h3>
+      <p class="desc" data-i18n="d_c5d">Consolidated rail-and-EV freight for green coffee moving from port to roastery.</p>
+      <div class="bar"><i style="width:34%"></i></div>
+      <div class="meta"><span>$680,000 / $2M</span><span style="color:var(--accent)" data-i18n="st_review">Under review</span></div>
+    </a>
+    <a class="pcard" href="#/project">
+      <div style="display:flex;gap:6px;flex-wrap:wrap"><span class="tag" data-i18n="t_cafe">Café</span><span class="tag green" data-i18n="t_inset">Inset</span></div>
+      <h3>Northwind Café Collective</h3>
+      <p class="desc" data-i18n="d_c6d">Member-owned café group with refrigerant management and rooftop solar.</p>
+      <div class="bar"><i style="width:61%"></i></div>
+      <div class="meta"><span>$305,000 / $500,000</span><span style="color:var(--up)" data-i18n="st_verified">Carbon: Verified</span></div>
+    </a>
+  </div>
+</section>
+
+<!-- ============================ PROJECT DETAIL ============================ -->
+<section id="page-project" class="page">
+  <div class="breadcrumb"><a href="#/discover" data-i18n="nav_discover">Discover</a> / Kilimanjaro Regenerative Coffee Cooperative</div>
+
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:20px;flex-wrap:wrap">
+    <div style="max-width:680px">
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">
+        <span class="tag green" data-i18n="t_regen">Regenerative</span><span class="tag blue" data-i18n="t_removal">Removal</span><span class="tag" data-i18n="p_l2">Layer 02 · Community</span>
+      </div>
+      <h1 style="margin-bottom:8px;font-size:clamp(26px,3vw,38px)">Kilimanjaro Regenerative Coffee Cooperative</h1>
+      <p class="muted" style="margin:0" data-i18n="p_sub">Agroforestry and soil-carbon transition across 2,400 smallholder farms in northern Tanzania. Round closes in 14 days.</p>
+    </div>
+    <div class="card" style="min-width:290px">
+      <div class="mono muted" style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px" data-i18n="p_prog">Raise progress</div>
+      <div style="font-size:27px;font-weight:800;letter-spacing:-.03em"><span style="color:var(--accent)">$864,000</span> <span class="muted" style="font-size:15px;font-weight:600">/ $1.2M</span></div>
+      <div class="bar" style="margin:12px 0 14px"><i style="width:72%"></i></div>
+      <div class="small muted" style="display:flex;justify-content:space-between"><span data-i18n="p_inv">412 investors</span><span data-i18n="p_min">Min. $250</span></div>
+      <a class="btn primary" href="#" style="width:100%;justify-content:center;margin-top:16px" data-i18n="p_invest">Invest now</a>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab on" data-tab="ov" data-i18n="p_tab_ov">Overview</button>
+    <button class="tab" data-tab="cap" data-i18n="p_tab_cap">Capital</button>
+    <button class="tab" data-tab="car" data-i18n="p_tab_car">Carbon</button>
+    <button class="tab" data-tab="upd" data-i18n="p_tab_upd">Updates</button>
+    <button class="tab" data-tab="doc" data-i18n="p_tab_doc">Documents</button>
+  </div>
+
+  <div class="pane on" id="pane-ov">
+    <div class="grid g2">
+      <div class="card">
+        <h3 data-i18n="p_ov_t">The project</h3>
+        <p class="small" data-i18n="p_ov_p1">A 2,400-farm cooperative transitioning from conventional shade-grown coffee to a full agroforestry system with leguminous shade trees, composted organic fertilizer and contour soil retention. The transition is capital-intensive in years 1–3 and profitable from year 4.</p>
+        <p class="small" data-i18n="p_ov_p2">Capital raised is used for nursery stock, composting infrastructure, farmer training and the first two years of MRV data collection.</p>
+      </div>
+      <div class="card">
+        <h3 data-i18n="p_ov_glance">At a glance</h3>
+        <table>
+          <tbody>
+            <tr><td class="muted" data-i18n="p_stage">Value-chain stage</td><td><b data-i18n="t_farm">Farming</b></td></tr>
+            <tr><td class="muted" data-i18n="p_jur">Jurisdiction</td><td><b data-i18n="p_jur_v">Tanzania</b></td></tr>
+            <tr><td class="muted" data-i18n="p_instr">Instrument</td><td data-i18n="p_instr_v">Reg CF-style community equity + SPV</td></tr>
+            <tr><td class="muted" data-i18n="p_ctype">Carbon project type</td><td><b data-i18n="p_ctype_v">Removal (soil + biomass)</b></td></tr>
+            <tr><td class="muted" data-i18n="p_meth">Methodology</td><td data-i18n="p_meth_v">VM0042-style improved agricultural land management</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="pane" id="pane-cap">
+    <div class="card" style="margin-bottom:16px">
+      <h3 data-i18n="p_rounds">Financing rounds</h3>
+      <table>
+        <thead><tr><th data-i18n="p_round">Round</th><th data-i18n="p_instr">Instrument</th><th data-i18n="p_target">Target</th><th data-i18n="p_sub">Subscribed</th><th data-i18n="st_status">Status</th></tr></thead>
+        <tbody>
+          <tr><td data-i18n="p_r1">Seed community round</td><td data-i18n="p_r1i">Reg CF-style direct equity</td><td>$250,000</td><td>$250,000</td><td><span class="tag green" data-i18n="st_closed">Closed</span></td></tr>
+          <tr><td data-i18n="p_r2">Community round II</td><td data-i18n="p_r2i">SPV (community)</td><td>$1,200,000</td><td>$864,000</td><td><span class="tag amber" data-i18n="st_live">Live</span></td></tr>
+          <tr><td data-i18n="p_r3">Institutional follow-on</td><td data-i18n="p_r3i">Jebi Capital fund</td><td>$3,000,000</td><td>—</td><td><span class="tag" data-i18n="st_draft">Draft</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="note warn">
+      <b data-i18n="p_regcf_t">Reg CF rolling limit:</b> <span data-i18n="p_regcf_p">$3.4M used of $5M across the trailing 12 months. If the SEC-approved $20M proposal takes effect, this validation rule updates automatically and the remaining headroom is recalculated.</span>
+    </div>
+  </div>
+
+  <div class="pane" id="pane-car">
+    <div class="grid g2" style="margin-bottom:16px">
+      <div class="card">
+        <h3 data-i18n="p_exante">Ex-ante carbon profile</h3>
+        <table>
+          <tbody>
+            <tr><td class="muted" data-i18n="p_annual">Estimated annual removal</td><td><b>18,400 tCO₂e / yr</b></td></tr>
+            <tr><td class="muted" data-i18n="p_baseline">Baseline</td><td data-i18n="p_baseline_v">Conventional shade-grown, default IPCC factors</td></tr>
+            <tr><td class="muted" data-i18n="p_unc">Uncertainty band</td><td data-i18n="p_unc_v">±30% (default factors, pre-monitoring)</td></tr>
+            <tr><td class="muted" data-i18n="p_add">Additionality</td><td data-i18n="p_add_v">Documented: transition not financially viable without carbon revenue</td></tr>
+            <tr><td class="muted" data-i18n="p_perm">Permanence buffer</td><td data-i18n="p_perm_v">15% pooled buffer</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h3 data-i18n="p_batches">Verification batches</h3>
+        <table>
+          <thead><tr><th data-i18n="p_batch">Batch</th><th data-i18n="p_monper">Monitoring period</th><th data-i18n="st_status">Status</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">KRC-2024-A</td><td>Jan – Dec 2024</td><td><span class="tag green" data-i18n="st_issued">Issued</span></td></tr>
+            <tr><td class="mono">KRC-2025-A</td><td>Jan – Dec 2025</td><td><span class="tag blue" data-i18n="st_vvbrev">Under VVB review</span></td></tr>
+            <tr><td class="mono">KRC-2026-A</td><td>Jan – Dec 2026</td><td><span class="tag" data-i18n="st_datacoll">Data collection</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:16px">
+      <h3 data-i18n="p_crstruct">Carbon rights structure</h3>
+      <p class="small" data-i18n="p_crstruct_p">Investors in this round receive a <b>contractual priority purchase right</b> over a defined share of verified removals, attached as a schedule to the investment agreement. It is <b>not a separately transferable security</b>.</p>
+      <table>
+        <tbody>
+          <tr><td class="muted" data-i18n="p_righttype">Right type</td><td data-i18n="p_righttype_v">Priority purchase right + 20% allocation share</td></tr>
+          <tr><td class="muted" data-i18n="p_vintage">Vintage coverage</td><td>2025 – 2030</td></tr>
+          <tr><td class="muted" data-i18n="p_price">Price formula</td><td data-i18n="p_price_v">Fixed floor + indexation, defined in schedule</td></tr>
+          <tr><td class="muted" data-i18n="p_transfer">Transferability</td><td data-i18n="p_transfer_v">Not transferable separately from the equity</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="note danger">
+      <b data-i18n="p_dc_t">Double-counting declaration.</b> <span data-i18n="p_dc_p">Verified removals from this project are <b>not</b> claimed as Scope 3 insets by any buyer. Tonnes allocated to carbon-rights holders are excluded from any other party's reduction claim. Once a tonne is tagged, the tag cannot be reversed without a re-validation workflow.</span>
+    </div>
+  </div>
+
+  <div class="pane" id="pane-upd">
+    <div class="card">
+      <div class="timeline">
+        <div class="tl done"><div class="when" data-i18n="p_m1">Mar 2026</div><p data-i18n="p_m1p">KRC-2024-A batch issued on registry. 17,900 tCO₂e transferred to platform ledger.</p></div>
+        <div class="tl done"><div class="when" data-i18n="p_m2">Jan 2026</div><p data-i18n="p_m2p">Community round II opened. $500,000 subscribed in the first 11 days.</p></div>
+        <div class="tl done"><div class="when" data-i18n="p_m3">Sep 2025</div><p data-i18n="p_m3p">VVB completed baseline validation. Methodology applicability confirmed.</p></div>
+        <div class="tl"><div class="when" data-i18n="p_m4">Apr 2026 (upcoming)</div><p data-i18n="p_m4p">KRC-2025-A monitoring report due to VVB.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pane" id="pane-doc">
+    <div class="card">
+      <table>
+        <thead><tr><th data-i18n="p_doc">Document</th><th data-i18n="p_access">Access tier</th><th data-i18n="p_updated">Updated</th></tr></thead>
+        <tbody>
+          <tr><td data-i18n="p_doc1">Community round offering circular</td><td><span class="tag green" data-i18n="st_public">Public</span></td><td>Jan 2026</td></tr>
+          <tr><td data-i18n="p_doc2">Risk disclosure statement</td><td><span class="tag green" data-i18n="st_public">Public</span></td><td>Jan 2026</td></tr>
+          <tr><td data-i18n="p_doc3">Carbon rights schedule (template)</td><td><span class="tag blue" data-i18n="st_investor">Investor</span></td><td>Feb 2026</td></tr>
+          <tr><td data-i18n="p_doc4">VVB verification report KRC-2024-A</td><td><span class="tag blue" data-i18n="st_investor">Investor</span></td><td>Mar 2026</td></tr>
+          <tr><td data-i18n="p_doc5">Full diligence pack</td><td><span class="tag amber" data-i18n="st_ndaroom">NDA / data room</span></td><td>Mar 2026</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ HOW IT WORKS ============================ -->
+<section id="page-how" class="page">
+  <h1 data-i18n="w_h1">How the capital stack works</h1>
+  <p class="muted" style="max-width:640px" data-i18n="w_p">Four layers, one project ID, one carbon identity. A project does not "graduate" out of its carbon obligations — it carries them forward.</p>
+
+  <div class="divider"></div>
+
+  <h2 data-i18n="w_l1">Layer 01 — Incubate</h2>
+  <p class="muted" style="max-width:680px" data-i18n="w_l1p">Onboarding, milestone tracking and a simplified carbon baseline. No money moves and no carbon credits exist at this stage.</p>
+  <div class="card">
+    <table>
+      <tbody>
+        <tr><td class="muted" style="width:220px" data-i18n="w_typstage">Typical project stage</td><td data-i18n="w_typstage_v">Pre-revenue to first sales</td></tr>
+        <tr><td class="muted" data-i18n="w_typraise">Typical raise size</td><td>$25,000 – $250,000</td></tr>
+        <tr><td class="muted" data-i18n="w_fee">Platform fee</td><td data-i18n="w_fee_v">No fee at incubation stage</td></tr>
+        <tr><td class="muted" data-i18n="w_req">Required outputs</td><td data-i18n="w_req_v">Carbon baseline profile, emissions source inventory, monitoring plan draft</td></tr>
+        <tr><td class="muted" data-i18n="w_timeline">Timeline</td><td data-i18n="w_timeline_v">4 – 12 weeks</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2 data-i18n="w_l2">Layer 02 — Community raise</h2>
+  <p class="muted" style="max-width:680px" data-i18n="w_l2p">Reg CF-style issuance and community SPVs. Fans, customers and local backers subscribe; funds are held in escrow and released only on close.</p>
+  <div class="card">
+    <table>
+      <tbody>
+        <tr><td class="muted" style="width:220px" data-i18n="w_typraise">Typical raise size</td><td>$250,000 – $5,000,000</td></tr>
+        <tr><td class="muted" data-i18n="w_cf_fee">Reg CF success fee</td><td><b>7.9%</b> <span data-i18n="w_cf_fee_v">of amount raised</span></td></tr>
+        <tr><td class="muted" data-i18n="w_spv_fee">SPV setup fee</td><td><b>$10,000</b></td></tr>
+        <tr><td class="muted" data-i18n="w_spv_mgmt">SPV management fee</td><td data-i18n="w_spv_mgmt_v"><b>5%</b> + <b>10%</b> carry on Wefunder-sourced SPVs</td></tr>
+        <tr><td class="muted" data-i18n="w_roll">Rolling limit</td><td data-i18n="w_roll_v">$5M per 12 months (Reg CF), revalidated on every issuance</td></tr>
+        <tr><td class="muted" data-i18n="w_req">Required outputs</td><td data-i18n="w_req2_v">Offering circular, risk disclosure, escrow arrangement, carbon rights schedule</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2 data-i18n="w_l3">Layer 03 — Institutional capital</h2>
+  <p class="muted" style="max-width:680px" data-i18n="w_l3p">Funds, data rooms, capital calls, NAV marks and carry waterfalls. Terms are negotiated privately and disclosed to LPs only.</p>
+  <div class="card">
+    <table>
+      <tbody>
+        <tr><td class="muted" style="width:220px" data-i18n="w_typraise">Typical raise size</td><td data-i18n="w_l3raise">$2M – $30M per fund or SPV</td></tr>
+        <tr><td class="muted" data-i18n="w_advisory">Advisory / placement</td><td data-i18n="w_advisory_v">Contact for terms</td></tr>
+        <tr><td class="muted" data-i18n="w_econ">Fund economics</td><td data-i18n="w_econ_v">Management fee + carry per fund agreement; carry basis shown as two explicit scenarios</td></tr>
+        <tr><td class="muted" data-i18n="w_tiers">Data room tiers</td><td data-i18n="w_tiers_v">Public → NDA-signed → Full diligence (enforced at the query layer)</td></tr>
+        <tr><td class="muted" data-i18n="w_req">Required outputs</td><td data-i18n="w_req3_v">Term sheet, SPV agreement, carbon rights annex, audit trail</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2 data-i18n="w_l4">Layer 04 — Carbon rights</h2>
+  <p class="muted" style="max-width:680px" data-i18n="w_l4p">MRV, third-party verification, registry issuance, entitlement allocation, retirement and disclosure packs. This layer runs across the entire stack and never resets.</p>
+  <div class="card">
+    <table>
+      <tbody>
+        <tr><td class="muted" style="width:220px" data-i18n="w_stds">Standards supported</td><td>Verra VCS, Gold Standard GS4GG, Puro.earth</td></tr>
+        <tr><td class="muted" data-i18n="w_flow">Workflow</td><td data-i18n="w_flow_v">Data capture → standardisation → QA → carbon calculation → VVB verification → registry issuance</td></tr>
+        <tr><td class="muted" data-i18n="w_designfee">Structural design fee</td><td data-i18n="w_designfee_v">Charged to the investing enterprise or project sponsor</td></tr>
+        <tr><td class="muted" data-i18n="w_mrvcost">MRV subscription</td><td data-i18n="w_mrvcost_v">Per project, per year</td></tr>
+        <tr><td class="muted" data-i18n="w_retfee">Retirement / custody fee</td><td data-i18n="w_retfee_v">Per retirement instruction executed on a registry</td></tr>
+        <tr><td class="muted" data-i18n="w_inv">Invariant</td><td><span class="mono" style="color:var(--accent)" data-i18n="w_inv_v">issued = allocated + retired + platform reserve</span>, <span data-i18n="w_inv_v2">at every point in time</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="note" style="margin-top:24px">
+    <b data-i18n="w_sep_t">Entity separation.</b> <span data-i18n="w_sep_p">Securities issuance, fund management and carbon asset services are operated by separate legal entities. The platform is shared infrastructure; contracts and money flows are not commingled.</span>
+  </div>
+</section>
+
+<!-- ============================ CARBON METHOD ============================ -->
+<section id="page-carbon" class="page">
+  <h1 data-i18n="c_h1">Carbon method &amp; MRV</h1>
+  <p class="muted" style="max-width:680px" data-i18n="c_p">What this platform will and will not claim. Read this before you invest or invest through us.</p>
+
+  <div class="note warn" style="margin:22px 0 28px">
+    <b data-i18n="c_warn_t">Investing is not buying carbon.</b> <span data-i18n="c_warn_p">A carbon asset only exists once a reduction or removal is additional, measured, third-party verified, registered, and transferred or retired on a registry. Equity produces none of this automatically.</span>
+  </div>
+
+  <h2 data-i18n="c_wf">The six-step dMRV workflow</h2>
+  <div class="grid g3" style="margin-top:16px">
+    <div class="card"><span class="tag blue" style="margin-bottom:10px">01</span><h3 data-i18n="c_s1">Data capture</h3><p class="small muted" style="margin:0" data-i18n="c_s1p">Manual entry for smallholder contexts, API and IoT ingestion for mills, roasteries and warehouses.</p></div>
+    <div class="card"><span class="tag blue" style="margin-bottom:10px">02</span><h3 data-i18n="c_s2">Standardisation</h3><p class="small muted" style="margin:0" data-i18n="c_s2p">Activity data mapped to methodology-specific parameters with source and applicability flags.</p></div>
+    <div class="card"><span class="tag blue" style="margin-bottom:10px">03</span><h3 data-i18n="c_s3">Quality control</h3><p class="small muted" style="margin:0" data-i18n="c_s3p">Missing-field detection, outlier flags and an append-only audit trail on every edit.</p></div>
+    <div class="card"><span class="tag blue" style="margin-bottom:10px">04</span><h3 data-i18n="c_s4">Carbon calculation</h3><p class="small muted" style="margin:0" data-i18n="c_s4p">Baseline and project emissions computed against the selected methodology, with an explicit uncertainty band.</p></div>
+    <div class="card"><span class="tag blue" style="margin-bottom:10px">05</span><h3 data-i18n="c_s5">Independent verification</h3><p class="small muted" style="margin:0" data-i18n="c_s5p">A VVB reviews the monitoring report through a dedicated portal and issues approve / conditional / reject.</p></div>
+    <div class="card"><span class="tag blue" style="margin-bottom:10px">06</span><h3 data-i18n="c_s6">Registry issuance</h3><p class="small muted" style="margin:0" data-i18n="c_s6p">Tonnes are issued, transferred or retired on the registry. The platform records entitlements; it is not itself a registry.</p></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2 data-i18n="c_tags_t">Use tags — the double-counting firewall</h2>
+  <p class="muted" style="max-width:680px" data-i18n="c_tags_p">Every verified tonne carries exactly one tag at any moment. Changing a tag is a workflow, not a dropdown.</p>
+  <div class="card">
+    <table>
+      <thead><tr><th data-i18n="c_th_tag">Tag</th><th data-i18n="c_th_mean">Meaning</th><th data-i18n="c_th_sell">Can it be sold or reassigned?</th></tr></thead>
+      <tbody>
+        <tr><td><span class="tag" data-i18n="t_scope3">Scope 3 inset</span></td><td data-i18n="c_m1">Claimed by an enterprise as a supply-chain reduction within its own boundary</td><td data-i18n="c_s1no">No — locked to that enterprise</td></tr>
+        <tr><td><span class="tag blue" data-i18n="t_offset">Offset retirement</span></td><td data-i18n="c_m2">Retired on a registry against residual emissions</td><td data-i18n="c_s2no">No — retirement is irreversible</td></tr>
+        <tr><td><span class="tag amber" data-i18n="t_held">Held</span></td><td data-i18n="c_m3">Allocated to a rights holder, not yet retired or claimed</td><td data-i18n="c_s3no">Only via the entitlement contract</td></tr>
+        <tr><td><span class="tag green" data-i18n="t_avail">Available</span></td><td data-i18n="c_m4">Unallocated platform reserve or project balance</td><td data-i18n="c_s4no">Yes, subject to contract terms</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2 data-i18n="c_ret_t">Retirement rules</h2>
+  <ul class="small" style="max-width:760px">
+    <li data-i18n="c_r1">Retirement is executed on the registry, not in a platform database. If the registry API is unavailable, the instruction enters a <b>manual retirement pending</b> state — the platform never shows a retirement as complete before the registry confirms it.</li>
+    <li data-i18n="c_r2">Every retirement certificate records project name, vintage, tonnage, standard, purpose and beneficiary (if the buyer elects to be named).</li>
+    <li data-i18n="c_r3">Once executed, the ledger row is locked. No edits, no reversal, no deletion.</li>
+  </ul>
+
+  <div class="note danger" style="margin-top:20px">
+    <b data-i18n="c_disc_t">Disclosure is support, not assurance.</b> <span data-i18n="c_disc_p">The platform prepares disclosure datasets. It does not certify that an enterprise's disclosures comply with any framework. Final responsibility sits with the enterprise and its auditors and legal advisers.</span>
+  </div>
+</section>
+
+<!-- ============================ FOUNDER DASHBOARD ============================ -->
+<section id="page-founder" class="page">
+  <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap">
+    <div>
+      <div class="breadcrumb" style="margin-bottom:6px" data-i18n="f_bc">Founder portal</div>
+      <h1 style="margin:0" data-i18n="f_h1">Your projects</h1>
+    </div>
+    <a class="btn primary" href="#/founder/new" data-i18n="f_new">+ New project</a>
+  </div>
+
+  <div class="grid g3" style="margin-top:24px">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <span class="tag green" data-i18n="f_ly2">Layer 02 · Community</span><span class="small muted" data-i18n="f_t4">4 open tasks</span>
+      </div>
+      <h3>Kilimanjaro Regenerative Cooperative</h3>
+      <div class="bar" style="margin:12px 0"><i style="width:72%"></i></div>
+      <div class="small muted" style="display:flex;justify-content:space-between"><span>$864k / $1.2M</span><span style="color:var(--up)" data-i18n="st_verified">Carbon: Verified</span></div>
+      <div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap">
+        <a class="btn ghost sm" href="#/project" data-i18n="f_pub">Public page</a>
+        <a class="btn ghost sm" href="#/carbon" data-i18n="f_mrv">MRV tasks</a>
+      </div>
+    </div>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <span class="tag amber" data-i18n="f_ly1">Layer 01 · Incubation</span><span class="small muted" data-i18n="f_t9">9 open tasks</span>
+      </div>
+      <h3>Arusha Drying Hub</h3>
+      <div class="bar" style="margin:12px 0"><i style="width:22%"></i></div>
+      <div class="small muted" style="display:flex;justify-content:space-between"><span data-i18n="f_nraising">Not raising yet</span><span style="color:var(--amber)" data-i18n="st_est">Carbon: Estimated</span></div>
+      <div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap">
+        <a class="btn ghost sm" href="#/founder/new" data-i18n="f_base">Carbon baseline</a>
+      </div>
+    </div>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <span class="tag blue" data-i18n="f_ly3">Layer 03 · Institutional</span><span class="small muted" data-i18n="f_t2">2 open tasks</span>
+      </div>
+      <h3>Ember Roastery Electrification</h3>
+      <div class="bar" style="margin:12px 0"><i style="width:88%"></i></div>
+      <div class="small muted" style="display:flex;justify-content:space-between"><span>$1.06M / $1.2M</span><span style="color:var(--up)" data-i18n="st_verified">Carbon: Verified</span></div>
+      <div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap">
+        <a class="btn ghost sm" href="#/institution" data-i18n="f_dr">Data room</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2 data-i18n="f_tasks_t">Open tasks across all projects</h2>
+  <div class="card" style="margin-top:14px">
+    <table>
+      <thead><tr><th data-i18n="f_th_task">Task</th><th data-i18n="f_th_proj">Project</th><th data-i18n="f_th_own">Owner</th><th data-i18n="f_th_due">Due</th><th data-i18n="st_status">Status</th></tr></thead>
+      <tbody>
+        <tr><td data-i18n="f_tk1">Upload 2026 Q1 monitoring data</td><td data-i18n="f_pr1">Kilimanjaro Regenerative</td><td data-i18n="f_you">You</td><td data-i18n="f_due1">12 May</td><td><span class="tag amber" data-i18n="st_open">Open</span></td></tr>
+        <tr><td data-i18n="f_tk2">Sign VVB engagement letter</td><td data-i18n="f_pr1">Kilimanjaro Regenerative</td><td data-i18n="f_you">You</td><td data-i18n="f_due2">15 May</td><td><span class="tag amber" data-i18n="st_open">Open</span></td></tr>
+        <tr><td data-i18n="f_tk3">Complete emissions source inventory</td><td data-i18n="f_pr2">Arusha Drying Hub</td><td data-i18n="f_you">You</td><td data-i18n="f_due3">20 May</td><td><span class="tag red" data-i18n="f_missing">Missing fields (7)</span></td></tr>
+        <tr><td data-i18n="f_tk4">Reply to investor question thread</td><td data-i18n="f_pr3">Ember Roastery</td><td data-i18n="f_you">You</td><td data-i18n="f_due4">09 May</td><td><span class="tag green" data-i18n="st_answered">Answered</span></td></tr>
+        <tr><td data-i18n="f_tk5">Confirm carbon rights schedule wording</td><td data-i18n="f_pr1">Kilimanjaro Regenerative</td><td data-i18n="f_legal">Legal</td><td data-i18n="f_due5">18 May</td><td><span class="tag blue" data-i18n="st_inreview">In review</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============================ FOUNDER NEW PROJECT ============================ -->
+<section id="page-founder-new" class="page">
+  <div class="breadcrumb"><a href="#/founder" data-i18n="nav_founder">Founder</a> / <span data-i18n="n_h1">New project</span></div>
+  <h1 data-i18n="n_h1">Create a project</h1>
+  <p class="muted" style="max-width:620px" data-i18n="n_p">Four steps. You can save and exit at any point — nothing is published until you submit for review.</p>
+
+  <div class="steps" style="margin-top:24px">
+    <div class="step on"><b>1</b> <span data-i18n="n_s1">Basics</span></div>
+    <div class="step"><b>2</b> <span data-i18n="n_s2">Financing</span></div>
+    <div class="step"><b>3</b> <span data-i18n="n_s3">Carbon profile</span></div>
+    <div class="step"><b>4</b> <span data-i18n="n_s4">Review</span></div>
+  </div>
+
+  <div class="grid g2">
+    <div class="card">
+      <h3 style="margin-bottom:16px" data-i18n="n_step1">Step 1 — Project basics</h3>
+      <div class="field">
+        <label class="f" for="pname" data-i18n="n_pname">Project name</label>
+        <input id="pname" type="text" placeholder="e.g. Arusha Drying Hub" data-i18n-ph="n_pname_ph" />
+      </div>
+      <div class="field">
+        <label class="f" for="stage" data-i18n="n_stage">Value-chain stage</label>
+        <select id="stage">
+          <option data-i18n="n_stage_o1">Farming / regenerative agriculture</option>
+          <option data-i18n="n_stage_o2">Primary processing / wet mill</option>
+          <option data-i18n="n_stage_o3">Roasting</option>
+          <option data-i18n="n_stage_o4">Packaging</option>
+          <option data-i18n="n_stage_o5">Logistics &amp; warehousing</option>
+          <option data-i18n="n_stage_o6">Café / retail</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="f" for="jur" data-i18n="n_jur">Jurisdiction</label>
+        <input id="jur" type="text" placeholder="Country / region" data-i18n-ph="n_jur_ph" />
+      </div>
+      <div class="field" style="margin-bottom:0">
+        <label class="f" for="entity" data-i18n="n_entity">Legal entity type</label>
+        <input id="entity" type="text" placeholder="e.g. Cooperative, Ltd, GmbH" data-i18n-ph="n_entity_ph" />
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom:16px" data-i18n="n_step2">Step 2 — Financing intent</h3>
+      <div class="field">
+        <label class="f" for="target" data-i18n="n_target">Target raise (USD)</label>
+        <input id="target" type="number" placeholder="1200000" />
+      </div>
+      <div class="field">
+        <label class="f" for="instr" data-i18n="p_instr">Instrument</label>
+        <select id="instr">
+          <option data-i18n="n_instr_o1">Reg CF-style community equity</option>
+          <option data-i18n="n_instr_o2">Community SPV</option>
+          <option data-i18n="n_instr_o3">Institutional fund / SPV</option>
+          <option data-i18n="n_instr_o4">Private placement</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="f" for="cright" data-i18n="n_cright">Bind carbon rights to this round?</label>
+        <select id="cright">
+          <option data-i18n="n_cright_o1">Yes — priority purchase right</option>
+          <option data-i18n="n_cright_o2">Yes — allocation share</option>
+          <option data-i18n="n_cright_o3">Yes — forward purchase agreement</option>
+          <option data-i18n="n_cright_o4">Not yet</option>
+        </select>
+      </div>
+      <div class="note" style="margin:0">
+        <span class="small" data-i18n="n_note">Binding carbon rights changes your legal pack. A carbon rights schedule must be drafted and reviewed before the offering circular can go live.</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h3 style="margin-bottom:16px" data-i18n="n_step3">Step 3 — Carbon profile (starting point)</h3>
+    <div class="grid g3">
+      <div class="field" style="margin:0">
+        <label class="f" for="ctype" data-i18n="p_ctype">Carbon project type</label>
+        <select id="ctype">
+          <option data-i18n="n_ctype_o1">Removal (soil / biomass)</option>
+          <option data-i18n="n_ctype_o2">Avoidance (methane, energy)</option>
+          <option data-i18n="n_ctype_o3">Supply-chain inset</option>
+          <option data-i18n="n_ctype_o4">Not determined</option>
+        </select>
+      </div>
+      <div class="field" style="margin:0">
+        <label class="f" for="meth" data-i18n="p_meth">Intended methodology</label>
+        <select id="meth">
+          <option data-i18n="n_meth_o1">VM0042-style agricultural land management</option>
+          <option data-i18n="n_meth_o2">AMS-III.D-style methane recovery</option>
+          <option data-i18n="n_meth_o3">AMS-II.C-style energy efficiency</option>
+          <option data-i18n="n_meth_o4">Need platform guidance</option>
+        </select>
+      </div>
+      <div class="field" style="margin:0">
+        <label class="f" for="data" data-i18n="n_data">Existing monitoring data?</label>
+        <select id="data">
+          <option data-i18n="n_data_o1">Yes — 12+ months</option>
+          <option data-i18n="n_data_o2">Yes — less than 12 months</option>
+          <option data-i18n="n_data_o3">No</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:10px;margin-top:22px;flex-wrap:wrap">
+    <button class="btn primary" data-i18n="n_save">Save draft</button>
+    <button class="btn ghost" data-i18n="n_submit">Submit for review</button>
+    <a class="btn ghost" href="#/founder" style="margin-left:auto" data-i18n="n_cancel">Cancel</a>
+  </div>
+</section>
+
+<!-- ============================ INVESTOR DASHBOARD ============================ -->
+<section id="page-investor" class="page">
+  <div class="breadcrumb" data-i18n="i_bc">Investor portal</div>
+  <h1 data-i18n="i_h1">Your portfolio</h1>
+
+  <div class="grid g4" style="margin:22px 0 8px">
+    <div class="card stat"><div class="n"><em>$14,500</em></div><div class="l" data-i18n="i_s1">Total invested</div></div>
+    <div class="card stat"><div class="n">6</div><div class="l" data-i18n="i_s2">Active investments</div></div>
+    <div class="card stat"><div class="n">42 t</div><div class="l" data-i18n="i_s3">Carbon rights allocated</div></div>
+    <div class="card stat"><div class="n" style="color:var(--up)">12 t</div><div class="l" data-i18n="i_s4">Retired on registry</div></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="grid g2">
+    <div class="card">
+      <h3 data-i18n="i_action">Action required</h3>
+      <table>
+        <tbody>
+          <tr><td data-i18n="i_a1">Sign carbon rights schedule</td><td style="text-align:end"><span class="tag amber" data-i18n="i_3days">3 days left</span></td></tr>
+          <tr><td data-i18n="i_a2">Complete KYC refresh</td><td style="text-align:end"><span class="tag amber" data-i18n="i_due20">Due 20 May</span></td></tr>
+          <tr><td data-i18n="i_a3">Confirm subscription — Ember Roastery</td><td style="text-align:end"><span class="tag blue" data-i18n="st_pending">Pending</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card">
+      <h3 data-i18n="i_recent">Recent activity</h3>
+      <div class="timeline" style="margin-top:14px">
+        <div class="tl done"><div class="when" data-i18n="p_m1">Mar 2026</div><p data-i18n="i_tl1">17,900 tCO₂e issued for Kilimanjaro Regenerative. 8 t allocated to your holding.</p></div>
+        <div class="tl done"><div class="when" data-i18n="p_m2">Jan 2026</div><p data-i18n="i_tl2">Ember Roastery round reached 88% of target.</p></div>
+        <div class="tl"><div class="when" data-i18n="p_m4d">Apr 2026</div><p data-i18n="i_tl3">Huila Wet-Mill VVB review scheduled.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap">
+    <h2 style="margin:0" data-i18n="i_holdings">Holdings</h2>
+    <a class="btn ghost sm" href="#/investor/portfolio" data-i18n="i_full">Full portfolio →</a>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <table>
+      <thead><tr><th data-i18n="f_th_proj">Project</th><th data-i18n="i_invested">Invested</th><th data-i18n="p_instr">Instrument</th><th data-i18n="h_l4t">Carbon rights</th><th data-i18n="st_status">Status</th></tr></thead>
+      <tbody>
+        <tr><td>Kilimanjaro Regenerative Cooperative</td><td>$5,000</td><td data-i18n="i_spvshare">SPV share</td><td data-i18n="i_8alloc">8 t allocated</td><td><span class="tag green" data-i18n="st_active">Active</span></td></tr>
+        <tr><td>Ember Roastery Electrification</td><td>$4,000</td><td data-i18n="i_direq">Direct equity</td><td data-i18n="i_prio">Priority right only</td><td><span class="tag green" data-i18n="st_active">Active</span></td></tr>
+        <tr><td>Northwind Café Collective</td><td>$3,000</td><td data-i18n="i_spvshare">SPV share</td><td data-i18n="i_6alloc">6 t allocated</td><td><span class="tag green" data-i18n="st_active">Active</span></td></tr>
+        <tr><td>Huila Wet-Mill Methane Capture</td><td>$2,500</td><td data-i18n="i_direq">Direct equity</td><td data-i18n="i_pendiss">Pending issuance</td><td><span class="tag amber" data-i18n="i_pendclose">Pending close</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="note warn" style="margin-top:20px">
+    <b data-i18n="i_liq_t">Liquidity notice.</b> <span data-i18n="i_liq_p">Private company securities are illiquid. There is no secondary market on this platform. Carbon rights are contractual rights attached to your investment and cannot be transferred separately.</span>
+  </div>
+</section>
+
+<!-- ============================ INVESTOR PORTFOLIO DETAIL ============================ -->
+<section id="page-investor-portfolio" class="page">
+  <div class="breadcrumb"><a href="#/investor" data-i18n="nav_investor">Investor</a> / <span data-i18n="i_holdings">Portfolio</span> / Kilimanjaro Regenerative</div>
+  <h1 data-i18n="q_h1">Investment detail</h1>
+
+  <div class="grid g2" style="margin-top:22px">
+    <div class="card">
+      <h3 data-i18n="q_equity">Equity</h3>
+      <table>
+        <tbody>
+          <tr><td class="muted" data-i18n="i_invested">Invested</td><td><b>$5,000</b></td></tr>
+          <tr><td class="muted" data-i18n="p_instr">Instrument</td><td data-i18n="q_instr">SPV share (Community SPV II)</td></tr>
+          <tr><td class="muted" data-i18n="q_holding">Holding</td><td>0.42% of SPV</td></tr>
+          <tr><td class="muted" data-i18n="q_subdate">Subscription date</td><td>14 Feb 2026</td></tr>
+          <tr><td class="muted" data-i18n="q_called">Capital called</td><td>$5,000 / $5,000</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card">
+      <h3 data-i18n="h_l4t">Carbon rights</h3>
+      <table>
+        <tbody>
+          <tr><td class="muted" data-i18n="p_righttype">Right type</td><td data-i18n="p_righttype_v">Priority purchase right + 20% allocation share</td></tr>
+          <tr><td class="muted" data-i18n="q_alloc">Allocated</td><td><b data-i18n="q_alloc_v">8 tCO₂e</b> <span data-i18n="q_vintage">(vintage 2024)</span></td></tr>
+          <tr><td class="muted" data-i18n="q_retired">Retired</td><td>0 tCO₂e</td></tr>
+          <tr><td class="muted" data-i18n="q_remaining">Remaining</td><td>8 tCO₂e</td></tr>
+          <tr><td class="muted" data-i18n="p_transfer">Transferability</td><td data-i18n="p_transfer_v">Not transferable separately</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h3 data-i18n="q_cert">Certificate &amp; documents</h3>
+    <table>
+      <thead><tr><th data-i18n="p_doc">Document</th><th data-i18n="q_type">Type</th><th data-i18n="st_issued">Issued</th></tr></thead>
+      <tbody>
+        <tr><td data-i18n="q_d1">SPV subscription agreement</td><td data-i18n="q_contract">Contract</td><td>14 Feb 2026</td></tr>
+        <tr><td data-i18n="q_d2">Carbon rights schedule</td><td data-i18n="q_annex">Contract annex</td><td>14 Feb 2026</td></tr>
+        <tr><td data-i18n="q_d3">Entitlement statement — vintage 2024</td><td data-i18n="q_ledger">Ledger statement</td><td>Mar 2026</td></tr>
+        <tr><td data-i18n="p_doc4">VVB verification report KRC-2024-A</td><td data-i18n="q_verif">Verification</td><td>Mar 2026</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="note" style="margin-top:20px">
+    <b data-i18n="q_upd_t">Project updates.</b> <span data-i18n="q_upd_p">Your investment and the project's carbon events appear on one shared timeline. You will be notified when a new verification batch is issued and when entitlements are recalculated.</span>
+  </div>
+</section>
+
+<!-- ============================ INSTITUTION ============================ -->
+<section id="page-institution" class="page">
+  <div class="breadcrumb" data-i18n="t_bc">Institution portal</div>
+  <h1 data-i18n="t_h1">Carbon ledger</h1>
+  <p class="muted" style="max-width:660px" data-i18n="t_p">Every verified tonne, its use tag and its registry state. The equation below is validated on every read and every write.</p>
+
+  <div class="ledger-eq" style="margin-top:22px">
+    <span class="k" data-i18n="t_issued">Issued</span> <span class="mono">214,000 t</span>
+    <span class="op">=</span>
+    <span class="k" data-i18n="t_alloc">Allocated</span> <span class="mono">132,400 t</span>
+    <span class="op">+</span>
+    <span class="k" data-i18n="t_retired">Retired</span> <span class="mono" style="color:var(--up)">61,800 t</span>
+    <span class="op">+</span>
+    <span class="k" data-i18n="t_reserve">Platform reserve</span> <span class="mono">19,800 t</span>
+    <span class="tag green" style="margin-inline-start:auto" data-i18n="t_bal">✓ Balanced</span>
+  </div>
+
+  <div class="card">
+    <table>
+      <thead>
+        <tr><th data-i18n="f_th_proj">Project</th><th data-i18n="t_std">Standard</th><th data-i18n="t_vintage">Vintage</th><th data-i18n="p_batch">Batch</th><th data-i18n="t_alloc">Allocated</th><th data-i18n="t_retired">Retired</th><th data-i18n="c_th_tag">Use tag</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td data-i18n="f_pr1">Kilimanjaro Regenerative</td><td>VCS</td><td>2024</td><td class="mono">KRC-2024-A</td>
+          <td class="mono">12,000 t</td><td class="mono">4,000 t</td>
+          <td><span class="tag" data-i18n="t_scope3">Scope 3 inset</span> 🔒</td>
+        </tr>
+        <tr>
+          <td data-i18n="f_pr3">Ember Roastery</td><td>Gold Standard</td><td>2025</td><td class="mono">EMB-2025-A</td>
+          <td class="mono">3,200 t</td><td class="mono">1,200 t</td>
+          <td><span class="tag blue" data-i18n="t_offset">Offset retirement</span> 🔒</td>
+        </tr>
+        <tr>
+          <td data-i18n="t_huila">Huila Wet-Mill</td><td>VCS</td><td>2025</td><td class="mono">HUI-2025-A</td>
+          <td class="mono">8,400 t</td><td class="mono">0 t</td>
+          <td><span class="tag amber" data-i18n="t_held">Held</span></td>
+        </tr>
+        <tr>
+          <td data-i18n="t_north">Northwind Café</td><td>Gold Standard</td><td>2024</td><td class="mono">NWC-2024-A</td>
+          <td class="mono">1,600 t</td><td class="mono">600 t</td>
+          <td><span class="tag green" data-i18n="t_avail">Available</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="note danger" style="margin-top:20px">
+    <b data-i18n="t_lock_t">Tag lock.</b> <span data-i18n="t_lock_p">A batch tagged <b>Scope 3 inset</b> cannot be switched to <b>Offset retirement</b>, and vice versa. Changing a use tag requires a use-change request, a double-counting re-validation and a legal sign-off. The lock is enforced server-side, not hidden in the interface.</span>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="grid g2">
+    <div class="card">
+      <h3 data-i18n="t_expo">Exposure summary</h3>
+      <table>
+        <tbody>
+          <tr><td class="muted" data-i18n="t_commit">Fund / SPV commitments</td><td><b>$12,000,000</b></td></tr>
+          <tr><td class="muted" data-i18n="t_unfunded">Unfunded commitment</td><td>$4,200,000</td></tr>
+          <tr><td class="muted" data-i18n="t_talloc">Tonnes allocated</td><td>25,200 t</td></tr>
+          <tr><td class="muted" data-i18n="t_tret">Tonnes retired</td><td>5,800 t</td></tr>
+          <tr><td class="muted" data-i18n="t_open">Forward contracts open</td><td>3</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card">
+      <h3 data-i18n="t_fwd">Forward contracts</h3>
+      <table>
+        <thead><tr><th data-i18n="t_counter">Counterparty project</th><th data-i18n="t_contracted">Contracted</th><th data-i18n="t_delivered">Delivered</th><th data-i18n="st_status">Status</th></tr></thead>
+        <tbody>
+          <tr><td data-i18n="f_pr1">Kilimanjaro Regenerative</td><td class="mono">9,000 t</td><td class="mono">4,000 t</td><td><span class="tag green" data-i18n="st_ontrack">On track</span></td></tr>
+          <tr><td data-i18n="t_huila">Huila Wet-Mill</td><td class="mono">4,000 t</td><td class="mono">0 t</td><td><span class="tag blue" data-i18n="st_sched">Scheduled</span></td></tr>
+          <tr><td data-i18n="f_pr3">Ember Roastery</td><td class="mono">2,500 t</td><td class="mono">1,200 t</td><td><span class="tag amber" data-i18n="st_shortfall">Shortfall risk</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:10px;margin-top:22px;flex-wrap:wrap">
+    <a class="btn primary" href="#/institution" data-i18n="t_issue">Issue retirement instruction</a>
+    <a class="btn ghost" href="#/institution" data-i18n="t_gen">Generate disclosure pack</a>
+  </div>
+</section>
+
+<!-- ============================ VVB ============================ -->
+<section id="page-vvb" class="page">
+  <div class="breadcrumb" data-i18n="v_bc">VVB portal</div>
+  <h1 data-i18n="v_h1">Verification queue</h1>
+
+  <div class="grid g4" style="margin:22px 0 8px">
+    <div class="card stat"><div class="n">7</div><div class="l" data-i18n="v_s1">Assigned tasks</div></div>
+    <div class="card stat"><div class="n">18 days</div><div class="l" data-i18n="v_s2">Avg. review cycle</div></div>
+    <div class="card stat"><div class="n" style="color:var(--up)">4</div><div class="l" data-i18n="v_s3">Issued this month</div></div>
+    <div class="card stat"><div class="n" style="color:var(--amber)">2</div><div class="l" data-i18n="v_s4">Returned for clarification</div></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="card">
+    <table>
+      <thead><tr><th data-i18n="p_batch">Batch</th><th data-i18n="f_th_proj">Project</th><th data-i18n="p_monper">Monitoring period</th><th data-i18n="t_std">Standard</th><th data-i18n="v_submitted">Submitted</th><th data-i18n="st_status">Status</th><th></th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="mono">KRC-2025-A</td><td data-i18n="f_pr1">Kilimanjaro Regenerative</td><td>Jan – Dec 2025</td><td>VCS</td><td>02 Apr 2026</td>
+          <td><span class="tag blue" data-i18n="st_inreview">In review</span></td>
+          <td style="text-align:end"><button class="btn ghost sm" data-i18n="v_open">Open</button></td>
+        </tr>
+        <tr>
+          <td class="mono">HUI-2025-A</td><td data-i18n="t_huila">Huila Wet-Mill</td><td>Jan – Dec 2025</td><td>VCS</td><td>28 Mar 2026</td>
+          <td><span class="tag amber" data-i18n="st_clarif">Clarification needed</span></td>
+          <td style="text-align:end"><button class="btn ghost sm" data-i18n="v_open">Open</button></td>
+        </tr>
+        <tr>
+          <td class="mono">EMB-2025-A</td><td data-i18n="f_pr3">Ember Roastery</td><td>Jan – Dec 2025</td><td>Gold Standard</td><td>19 Mar 2026</td>
+          <td><span class="tag green" data-i18n="st_approved">Approved</span></td>
+          <td style="text-align:end"><button class="btn ghost sm" data-i18n="v_view">View</button></td>
+        </tr>
+        <tr>
+          <td class="mono">NWC-2026-A</td><td data-i18n="t_north">Northwind Café</td><td>Jan – Jun 2026</td><td>Gold Standard</td><td>—</td>
+          <td><span class="tag" data-i18n="st_datacoll">Data collection</span></td>
+          <td style="text-align:end"><span class="small muted" data-i18n="st_notsub">Not submitted</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="grid g2" style="margin-top:16px">
+    <div class="card">
+      <h3 data-i18n="v_ws">Review workspace — KRC-2025-A</h3>
+      <ul class="small" style="margin-bottom:0">
+        <li data-i18n="v_li1">Monitoring report: <b>attached</b></li>
+        <li data-i18n="v_li2">Data completeness: <b>98.2%</b> — 4 fields flagged</li>
+        <li data-i18n="v_li3">Outliers detected: <b>2</b> (plot 118, plot 204)</li>
+        <li data-i18n="v_li4">Audit trail: <b>append-only, 312 entries</b></li>
+        <li data-i18n="v_li5">Methodology applicability: <b>confirmed</b></li>
+      </ul>
+      <div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap">
+        <button class="btn primary sm" data-i18n="v_approve">Approve</button>
+        <button class="btn ghost sm" data-i18n="v_cond">Approve with conditions</button>
+        <button class="btn ghost sm" style="color:var(--down)" data-i18n="v_reject">Reject</button>
+      </div>
+    </div>
+    <div class="card">
+      <h3 data-i18n="v_cross_t">dMRV cross-activity status</h3>
+      <p class="small muted" data-i18n="v_cross_p">If the standard's draft dMRV rules on cross-activity mutual recognition and interim issuance tracks are adopted, a dMRV design already technically audited on another project may be reused within defined parameters.</p>
+      <table>
+        <tbody>
+          <tr><td class="muted" data-i18n="v_cross_r">Cross-activity recognition</td><td><span class="tag amber" data-i18n="v_appcheck">Applicability check required</span></td></tr>
+          <tr><td class="muted" data-i18n="v_interim">Interim issuance track</td><td><span class="tag" data-i18n="v_notapp">Not applicable to this batch</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ ADMIN ============================ -->
+<section id="page-admin" class="page">
+  <div class="breadcrumb" data-i18n="g_bc">Platform operations</div>
+  <h1 data-i18n="g_h1">Registry integration status</h1>
+  <p class="muted" style="max-width:660px" data-i18n="g_p">The platform is not a registry. It is an aggregator of registry state, with a manual fallback path that never reports unconfirmed states as complete.</p>
+
+  <div class="grid g2" style="margin-top:22px">
+    <div class="card">
+      <h3 style="margin-bottom:14px" data-i18n="g_verra">Verra registry</h3>
+      <div class="conn" style="margin-bottom:10px"><span class="pulse"></span><span data-i18n="g_conn1">API connected · read + write</span></div>
+      <table>
+        <tbody>
+          <tr><td class="muted" data-i18n="g_lastsync">Last sync</td><td class="mono">2026-05-06 09:42 UTC</td></tr>
+          <tr><td class="muted" data-i18n="g_ptrans">Pending transfers</td><td>2</td></tr>
+          <tr><td class="muted" data-i18n="g_pret">Pending retirements</td><td>1</td></tr>
+          <tr><td class="muted" data-i18n="g_fail">Failed calls (24h)</td><td style="color:var(--up)">0</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card">
+      <h3 style="margin-bottom:14px" data-i18n="g_gs">Gold Standard registry</h3>
+      <div class="conn" style="margin-bottom:10px"><span class="pulse amber"></span><span data-i18n="g_conn2">API-first registry · sandbox mode</span></div>
+      <table>
+        <tbody>
+          <tr><td class="muted" data-i18n="g_lastsync">Last sync</td><td class="mono">2026-05-06 09:40 UTC</td></tr>
+          <tr><td class="muted" data-i18n="g_ptrans">Pending transfers</td><td>0</td></tr>
+          <tr><td class="muted" data-i18n="g_pret">Pending retirements</td><td>0</td></tr>
+          <tr><td class="muted" data-i18n="g_fail">Failed calls (24h)</td><td style="color:var(--amber)" data-i18n="g_fail_v">3 (timeout)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h3 data-i18n="g_manual">Manual fallback queue</h3>
+    <table>
+      <thead><tr><th data-i18n="g_instr">Instruction</th><th data-i18n="q_type">Type</th><th data-i18n="f_th_proj">Project</th><th data-i18n="v_submitted">Submitted</th><th data-i18n="st_status">Status</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">RET-0041</td><td data-i18n="g_ret">Retirement</td><td data-i18n="f_pr3">Ember Roastery</td><td>05 May 2026</td><td><span class="tag amber" data-i18n="g_mret">Manual retirement pending</span></td></tr>
+        <tr><td class="mono">TRF-0042</td><td data-i18n="g_trf">Transfer</td><td data-i18n="t_huila">Huila Wet-Mill</td><td>04 May 2026</td><td><span class="tag blue" data-i18n="g_await">Awaiting registry confirmation</span></td></tr>
+      </tbody>
+    </table>
+    <div class="note warn" style="margin:16px 0 0">
+      <span data-i18n="g_note">Retirement instructions in this queue are <b>not</b> shown to the enterprise as complete. The enterprise disclosure pack will show them as pending until the registry confirms.</span>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2 data-i18n="g_comp">Compliance workflows</h2>
+  <div class="grid g3" style="margin-top:16px">
+    <div class="card">
+      <h3 style="font-size:15px" data-i18n="g_sec">Securities</h3>
+      <ul class="small" style="margin-bottom:0">
+        <li data-i18n="g_sec1">Reg CF rolling limit validation — <b style="color:var(--up)">active</b></li>
+        <li data-i18n="g_sec2">Offering circular templates — <b>7 active</b></li>
+        <li data-i18n="g_sec3">Risk disclosure enforcement — <b style="color:var(--up)">on</b></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 style="font-size:15px" data-i18n="g_rwa">RWA / VASP trigger</h3>
+      <p class="small" style="margin-bottom:8px"><span data-i18n="g_rwa_s">Current status:</span> <span class="tag green" data-i18n="g_rwa_nt">Not triggered</span></p>
+      <p class="small muted" style="margin:0" data-i18n="g_rwa_p">The platform does not custody private keys and does not operate a trading venue. Tokenisation or wallet custody would trigger a separate licensing assessment before launch.</p>
+    </div>
+    <div class="card">
+      <h3 style="font-size:15px">KYC / AML</h3>
+      <ul class="small" style="margin-bottom:0">
+        <li data-i18n="g_kyc1">Investor KYC queue — <b>14 pending</b></li>
+        <li data-i18n="g_kyc2">Institutional EDD — <b>2 in review</b></li>
+        <li data-i18n="g_kyc3">Sanctions screening — <b>last run 09:00 UTC</b></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <span data-i18n="ft_t">ZCC Platform — demonstration interface. Securities issuance, fund management and carbon asset services are separate legal entities. Carbon disclosures prepared here are data inputs, not compliance opinions.</span>
+</footer>
+
+<script>
+/* ==================== router ==================== */
+(function () {
+  var ROUTES = {
+    '/home': 'page-home',
+    '/discover': 'page-discover',
+    '/project': 'page-project',
+    '/how': 'page-how',
+    '/carbon': 'page-carbon',
+    '/founder': 'page-founder',
+    '/founder/new': 'page-founder-new',
+    '/investor': 'page-investor',
+    '/investor/portfolio': 'page-investor-portfolio',
+    '/institution': 'page-institution',
+    '/vvb': 'page-vvb',
+    '/admin': 'page-admin'
+  };
+
+  function navigate() {
+    var hash = location.hash.replace(/^#/, '') || '/home';
+    if (hash.length > 1 && hash.slice(-1) === '/') hash = hash.slice(0, -1);
+    var id = ROUTES[hash] || 'page-home';
+
+    var pages = document.querySelectorAll('.page');
+    for (var i = 0; i < pages.length; i++) pages[i].classList.remove('active');
+    var target = document.getElementById(id);
+    if (!target) target = document.getElementById('page-home');
+    target.classList.add('active');
+
+    if (id === 'page-project') resetTabs();
+    window.scrollTo(0, 0);
+
+    var seg = '/' + (hash.split('/')[1] || 'home');
+    var links = document.querySelectorAll('nav.top a.lk[href]');
+    for (var j = 0; j < links.length; j++) {
+      var href = links[j].getAttribute('href').replace(/^#/, '');
+      if (!href || href.charAt(0) !== '/') continue;
+      var linkSeg = '/' + (href.split('/')[1] || 'home');
+      links[j].classList.toggle('on', linkSeg === seg);
+    }
+  }
+
+  window.addEventListener('hashchange', navigate);
+  window.addEventListener('DOMContentLoaded', navigate);
+
+  function resetTabs() {
+    var tabs = document.querySelectorAll('#page-project .tab');
+    var panes = document.querySelectorAll('#page-project .pane');
+    for (var i = 0; i < tabs.length; i++) tabs[i].classList.toggle('on', i === 0);
+    for (var k = 0; k < panes.length; k++) panes[k].classList.toggle('on', k === 0);
+  }
+
+  document.addEventListener('click', function (e) {
+    var tab = e.target.closest ? e.target.closest('#page-project .tab') : null;
+    if (!tab) return;
+    var key = tab.getAttribute('data-tab');
+    var tabs = document.querySelectorAll('#page-project .tab');
+    var panes = document.querySelectorAll('#page-project .pane');
+    for (var i = 0; i < tabs.length; i++) tabs[i].classList.toggle('on', tabs[i] === tab);
+    for (var k = 0; k < panes.length; k++) panes[k].classList.toggle('on', panes[k].id === 'pane-' + key);
+  });
+
+  document.addEventListener('click', function (e) {
+    var chip = e.target.closest ? e.target.closest('.chip') : null;
+    if (!chip) return;
+    var siblings = chip.parentElement.querySelectorAll('.chip');
+    for (var i = 0; i < siblings.length; i++) siblings[i].classList.remove('on');
+    chip.classList.add('on');
+  });
+})();
+
+/* ==================== i18n ==================== */
+(function () {
+  var I18N = {
+  zh: {
+    nav_home:"首页", nav_discover:"发现", nav_how:"运作方式", nav_carbon:"碳方法", nav_portals:"门户",
+    nav_founder:"创始人", nav_founder_s:"发起并管理融资", nav_investor:"投资人", nav_investor_s:"投资组合与碳权益",
+    nav_institution:"机构", nav_institution_s:"碳账本与远期合约", nav_vvb:"VVB 核证机构", nav_vvb_s:"核证队列",
+    nav_admin:"管理员", nav_admin_s:"注册处运营与合规", nav_raise:"融资",
+    h_eye:"ZeroCarbon Coffee 资本栈",
+    h_h1:"从一颗咖啡豆的碳基线，<br>到<span class=\"hl\">可退出的资本栈</span>。",
+    h_p:"在 JebiStarter 孵化。与社区一起募资。引入机构资本。为每笔投资绑定可核证的碳权益——然后在注册处注销，仅一次，永不重复。",
+    h_cta1:"浏览项目", h_cta2:"运作方式", h_cta3:"碳方法",
+    h_s1:"已入驻项目", h_s2:"已完成募资", h_s3:"已核证吨数（tCO₂e）", h_s4:"已注销吨数（tCO₂e）",
+    h_stack_t:"四层资本栈",
+    h_stack_p:"每个项目从孵化到退出都携带同一个碳身份。点击某一层查看其规则、典型募资规模与费用结构。",
+    h_l1n:"层级 01", h_l1t:"孵化", h_l1p:"JebiStarter 式入驻。里程碑、简化碳基线、社区预热。此阶段不发生资金流动。",
+    h_l2n:"层级 02", h_l2t:"社区募资", h_l2p:"Reg CF 式发行与 SPV。粉丝与本地支持者通过托管认购，仅在交割时放款。",
+    h_l3n:"层级 03", h_l3t:"机构资本", h_l3p:"Jebi Capital 式基金、数据室、出资召回、carry 瀑布与退出分配。",
+    h_l4n:"层级 04", h_l4t:"碳权益", h_l4p:"MRV、VVB 核证、注册处签发、权益分配、注销与披露包。",
+    h_ft:"精选项目", h_fs:"横跨三层资本栈的进行中项目。", h_viewall:"查看全部 142 →",
+    h_c1d:"坦桑尼亚北部 2,400 户小农的农林复合与土壤碳转型。",
+    h_c2d:"哥伦比亚中型合作社水洗厂的废水甲烷回收与太阳能干燥。",
+    h_c3d:"热泵烘焙厂改造，配套消费者订阅模式与开放碳账本。",
+    h_nb_t:"投资不等于购买碳", h_nb_s:"关于本平台被误解最多的一点，直说。",
+    h_nb_p:"股权不会自动产生碳信用。只有当减排或清除<b>具备额外性、经计量、经第三方核证、在注册处登记并完成转移或注销</b>后，碳资产才存在。",
+    h_nb_btn:"阅读方法论 →",
+    h_fw_t:"防重复计算防火墙", h_fw_s:"在账本层面强制执行，而不是写在政策 PDF 里。",
+    h_fw_p:"每一核证吨位任一时刻仅携带一个用途标签：<span class=\"tag\" data-i18n=\"t_scope3\">Scope 3 内嵌消减</span> <span class=\"tag blue\" data-i18n=\"t_offset\">注销抵消</span> <span class=\"tag amber\" data-i18n=\"t_held\">持有</span> <span class=\"tag green\" data-i18n=\"t_avail\">可用</span>。切换标签需要重新核证流程。",
+    h_fw_btn:"打开碳账本 →",
+    d_h1:"发现项目",
+    d_p:"按价值链环节、资本层与碳项目类型筛选。碳状态在投资前展示——绝不在投资后。",
+    d_all_st:"全部环节", d_all_ly:"全部层级", d_inc:"孵化", d_com:"社区", d_inst:"机构", d_cver:"碳已核证",
+    d_c1d:"2,400 户小农的农林复合与土壤碳转型。",
+    d_c2d:"哥伦比亚 Huila 的废水甲烷回收与太阳能干燥。",
+    d_c3d:"热泵烘焙厂改造，配套消费者订阅模式。",
+    d_c4d:"面向东南亚精品咖啡馆连锁的可回收容器系统。",
+    d_c5d:"从港口到烘焙厂的生豆铁路+电动车整合货运。",
+    d_c6d:"会员制咖啡馆集团，含制冷剂管理与屋顶光伏。",
+    p_l2:"层级 02 · 社区",
+    p_sub:"坦桑尼亚北部 2,400 户小农的农林复合与土壤碳转型。本轮 14 天后截止。",
+    p_prog:"募资进度", p_inv:"412 位投资人", p_min:"最低 $250", p_invest:"立即投资",
+    p_tab_ov:"概览", p_tab_cap:"资本", p_tab_car:"碳", p_tab_upd:"动态", p_tab_doc:"文件",
+    p_ov_t:"项目概况",
+    p_ov_p1:"一个 2,400 户农场的合作社，从传统遮荫种植咖啡转型为以豆科遮荫树、堆肥有机肥与等高线保土为核心的完整农林复合系统。转型在第 1–3 年资本密集，第 4 年起盈利。",
+    p_ov_p2:"募集资金用于苗圃、堆肥基础设施、农户培训以及前两年的 MRV 数据采集。",
+    p_ov_glance:"一览", p_stage:"价值链环节", p_jur:"司法辖区", p_jur_v:"坦桑尼亚",
+    p_instr:"工具", p_instr_v:"Reg CF 式社区股权 + SPV",
+    p_ctype:"碳项目类型", p_ctype_v:"清除（土壤 + 生物质）",
+    p_meth:"方法论", p_meth_v:"VM0042 式改进农业用地管理",
+    p_rounds:"融资轮次", p_round:"轮次", p_target:"目标", p_sub:"已认购",
+    p_r1:"种子社区轮", p_r1i:"Reg CF 式直接股权", p_r2:"社区轮 II", p_r2i:"SPV（社区）", p_r3:"机构跟进轮", p_r3i:"Jebi Capital 基金",
+    p_regcf_t:"Reg CF 滚动上限：",
+    p_regcf_p:"过去 12 个月已用 $3.4M / $5M。若 SEC 批准的 $20M 方案生效，该校验规则自动更新并重算剩余额度。",
+    p_exante:"事前碳画像", p_annual:"预计年清除量", p_baseline:"基线",
+    p_baseline_v:"传统遮荫种植，IPCC 默认因子",
+    p_unc:"不确定度区间", p_unc_v:"±30%（默认因子，监测前）",
+    p_add:"额外性", p_add_v:"已存档：无碳收入则转型不具财务可行性",
+    p_perm:"持久性缓冲池", p_perm_v:"15% 联合缓冲池",
+    p_batches:"核证批次", p_batch:"批次", p_monper:"监测期",
+    p_crstruct:"碳权益结构",
+    p_crstruct_p:"本轮投资人获得对既定份额核证清除量的<b>合同性优先购买权</b>，作为投资协议附件。它<b>不是可单独转让的证券</b>。",
+    p_righttype:"权利类型", p_righttype_v:"优先购买权 + 20% 分配份额",
+    p_vintage:"年份覆盖", p_price:"定价公式", p_price_v:"固定下限 + 指数化，详见附件",
+    p_transfer:"可转让性", p_transfer_v:"不可与股权分离单独转让",
+    p_dc_t:"防重复计算声明。",
+    p_dc_p:"本项目的核证清除量<b>不会</b>被任何买方申报为 Scope 3 内嵌消减。分配给碳权益持有人的吨位不进入其他任何主体的减排申报。一旦打标，未经重新核证流程不得改标。",
+    p_m1:"2026 年 3 月", p_m1p:"KRC-2024-A 批次已在注册处签发。17,900 吨 CO₂e 转入平台账本。",
+    p_m2:"2026 年 1 月", p_m2p:"社区轮 II 开启。前 11 天认购 $500,000。",
+    p_m3:"2025 年 9 月", p_m3p:"VVB 完成基线核验。方法论适用性已确认。",
+    p_m4:"2026 年 4 月（即将）", p_m4d:"2026 年 4 月", p_m4p:"KRC-2025-A 监测报告需提交 VVB。",
+    p_doc:"文件", p_access:"访问层级", p_updated:"更新时间",
+    p_doc1:"社区轮发售通函", p_doc2:"风险披露声明", p_doc3:"碳权益附表（模板）", p_doc4:"VVB 核证报告 KRC-2024-A", p_doc5:"完整尽调包",
+    w_h1:"资本栈如何运作",
+    w_p:"四层、一个项目 ID、一个碳身份。项目不会“毕业”脱离碳义务——碳义务贯穿始终。",
+    w_l1:"层级 01 — 孵化",
+    w_l1p:"入驻、里程碑跟踪与简化碳基线。此阶段无资金流动，也不存在碳信用。",
+    w_typstage:"典型项目阶段", w_typstage_v:"收入前至首批销售",
+    w_typraise:"典型募资规模", w_fee:"平台费", w_fee_v:"孵化阶段免费",
+    w_req:"必需交付物",
+    w_req_v:"碳基线画像、排放源清单、监测计划草案",
+    w_timeline:"时间表", w_timeline_v:"4 – 12 周",
+    w_l2:"层级 02 — 社区募资",
+    w_l2p:"Reg CF 式发行与社区 SPV。粉丝、顾客与本地支持者认购；资金托管，交割时才释放。",
+    w_cf_fee:"Reg CF 成功费", w_cf_fee_v:"募资额的",
+    w_spv_fee:"SPV 设立费", w_spv_mgmt:"SPV 管理费",
+    w_spv_mgmt_v:"Wefunder 渠道 SPV 收 <b>5%</b> + <b>10%</b> carry",
+    w_roll:"滚动上限", w_roll_v:"每 12 个月 $5M（Reg CF），每次发行重新校验",
+    w_req2_v:"发售通函、风险披露、托管安排、碳权益附表",
+    w_l3:"层级 03 — 机构资本",
+    w_l3p:"基金、数据室、出资召回、净值标记与 carry 瀑布。条款私下协商，仅向 LP 披露。",
+    w_l3raise:"每只基金或 SPV $2M – $30M",
+    w_advisory:"顾问 / 承销", w_advisory_v:"条款面议",
+    w_econ:"基金经济条款", w_econ_v:"管理费 + carry 按基金协议；carry 基数以两个明确情景列示",
+    w_tiers:"数据室层级", w_tiers_v:"公开 → 签 NDA → 完整尽调（在查询层强制执行）",
+    w_req3_v:"条款清单、SPV 协议、碳权益附件、审计轨迹",
+    w_l4:"层级 04 — 碳权益",
+    w_l4p:"MRV、第三方核证、注册处签发、权益分配、注销与披露包。这一层贯穿整个资本栈，永不重置。",
+    w_stds:"支持的标准", w_flow:"工作流",
+    w_flow_v:"数据采集 → 标准化 → 质控 → 碳计算 → VVB 核证 → 注册处签发",
+    w_designfee:"结构设计费", w_designfee_v:"向投资企业或项目发起人收取",
+    w_mrvcost:"MRV 订阅", w_mrvcost_v:"按项目、按年",
+    w_retfee:"注销 / 托管费", w_retfee_v:"按在注册处执行的每笔注销指令收取",
+    w_inv:"恒等式", w_inv_v:"签发 = 分配 + 注销 + 平台预留", w_inv_v2:"，任一时点均成立",
+    w_sep_t:"实体分离。",
+    w_sep_p:"证券发行、基金管理与碳资产服务由独立法律实体运营。平台是共享基础设施；合同与资金流不混同。",
+    c_h1:"碳方法与 MRV",
+    c_p:"本平台会与不会申报什么。在投资或经由我们投资之前先读这里。",
+    c_warn_t:"投资不等于购买碳。",
+    c_warn_p:"只有当减排或清除具备额外性、经计量、经第三方核证、在注册处登记并完成转移或注销，碳资产才存在。股权不会自动产生这些。",
+    c_wf:"六步 dMRV 工作流",
+    c_s1:"数据采集", c_s1p:"小农场景手动录入，工厂、烘焙厂与仓库通过 API 和 IoT 接入。",
+    c_s2:"标准化", c_s2p:"活动数据映射到方法论专属参数，带来源与适用性标记。",
+    c_s3:"质量控制", c_s3p:"缺失字段检测、异常值标记，每次编辑均有只增不改的审计轨迹。",
+    c_s4:"碳计算", c_s4p:"按所选方法论计算基线与项目排放，并给出明确的不确定度区间。",
+    c_s5:"独立核证", c_s5p:"VVB 通过专属门户审阅监测报告，给出批准 / 有条件批准 / 驳回。",
+    c_s6:"注册处签发", c_s6p:"吨位在注册处签发、转移或注销。平台记录权益；平台本身不是注册处。",
+    c_tags_t:"用途标签——防重复计算防火墙",
+    c_tags_p:"每一核证吨位任一时刻仅有一个标签。改标签是流程，不是下拉框。",
+    c_th_tag:"标签", c_th_mean:"含义", c_th_sell:"可否出售或重新分配？",
+    c_m1:"由企业作为自身边界内的供应链减排申报", c_s1no:"否——锁定到该企业",
+    c_m2:"在注册处针对残余排放注销", c_s2no:"否——注销不可逆",
+    c_m3:"分配给权益持有人，尚未注销或申报", c_s3no:"仅可通过权益合同",
+    c_m4:"未分配的平台预留或项目余额", c_s4no:"可以，视合同条款而定",
+    c_ret_t:"注销规则",
+    c_r1:"注销在注册处执行，不在平台数据库。若注册处 API 不可用，指令进入<b>人工注销待处理</b>状态——在注册处确认前，平台绝不将注销显示为已完成。",
+    c_r2:"每张注销证书记录项目名称、年份、吨数、标准、用途与受益人（若买方选择具名）。",
+    c_r3:"执行后账本行即锁定。不可编辑、不可回退、不可删除。",
+    c_disc_t:"披露是辅助，不是鉴证。",
+    c_disc_p:"平台编制披露数据集，不认证企业披露符合任何框架。最终责任由企业及其审计师与法律顾问承担。",
+    f_bc:"创始人门户", f_h1:"你的项目", f_new:"+ 新项目",
+    f_ly2:"层级 02 · 社区", f_t4:"4 个待办", f_ly1:"层级 01 · 孵化", f_t9:"9 个待办", f_ly3:"层级 03 · 机构", f_t2:"2 个待办",
+    f_pub:"公开页", f_mrv:"MRV 任务", f_nraising:"尚未募资", f_base:"碳基线", f_dr:"数据室",
+    f_tasks_t:"所有项目的待办", f_th_task:"任务", f_th_proj:"项目", f_th_own:"负责人", f_th_due:"截止",
+    f_tk1:"上传 2026 Q1 监测数据", f_tk2:"签署 VVB 委托函", f_tk3:"完成排放源清单", f_tk4:"回复投资人提问线程", f_tk5:"确认碳权益附表措辞",
+    f_pr1:"Kilimanjaro Regenerative", f_pr2:"Arusha Drying Hub", f_pr3:"Ember Roastery",
+    f_you:"你", f_legal:"法务", f_missing:"缺失字段（7）",
+    f_due1:"5 月 12 日", f_due2:"5 月 15 日", f_due3:"5 月 20 日", f_due4:"5 月 9 日", f_due5:"5 月 18 日",
+    n_h1:"新建项目",
+    n_p:"四步。可随时保存退出——提交审核前不会发布。",
+    n_s1:"基本信息", n_s2:"融资", n_s3:"碳画像", n_s4:"确认",
+    n_step1:"第 1 步 — 项目基本信息",
+    n_pname:"项目名称", n_pname_ph:"例如：Arusha Drying Hub",
+    n_stage:"价值链环节",
+    n_stage_o1:"种植 / 再生农业", n_stage_o2:"初加工 / 水洗厂", n_stage_o3:"烘焙", n_stage_o4:"包装", n_stage_o5:"物流与仓储", n_stage_o6:"咖啡馆 / 零售",
+    n_jur:"司法辖区", n_jur_ph:"国家 / 地区", n_entity:"法律实体类型", n_entity_ph:"例如：合作社、有限公司",
+    n_step2:"第 2 步 — 融资意向",
+    n_target:"目标募资（美元）",
+    n_instr_o1:"Reg CF 式社区股权", n_instr_o2:"社区 SPV", n_instr_o3:"机构基金 / SPV", n_instr_o4:"私募",
+    n_cright:"本轮是否绑定碳权益？",
+    n_cright_o1:"是——优先购买权", n_cright_o2:"是——分配份额", n_cright_o3:"是——远期购买协议", n_cright_o4:"暂不",
+    n_note:"绑定碳权益会改变法律文件包。发售通函上线前必须起草并审核碳权益附表。",
+    n_step3:"第 3 步 — 碳画像（起点）",
+    n_ctype_o1:"清除（土壤 / 生物质）", n_ctype_o2:"避免（甲烷、能源）", n_ctype_o3:"供应链内嵌消减", n_ctype_o4:"未确定",
+    n_meth_o1:"VM0042 式农业用地管理", n_meth_o2:"AMS-III.D 式甲烷回收", n_meth_o3:"AMS-II.C 式能效", n_meth_o4:"需要平台指引",
+    n_data:"已有监测数据？", n_data_o1:"有——12 个月以上", n_data_o2:"有——不足 12 个月", n_data_o3:"无",
+    n_save:"保存草稿", n_submit:"提交审核", n_cancel:"取消",
+    i_bc:"投资人门户", i_h1:"你的投资组合",
+    i_s1:"已投资总额", i_s2:"持仓投资数", i_s3:"已分配碳权益", i_s4:"注册处已注销",
+    i_action:"需要操作", i_a1:"签署碳权益附表", i_3days:"剩 3 天", i_a2:"完成 KYC 更新", i_due20:"截止 5 月 20 日", i_a3:"确认认购 — Ember Roastery",
+    i_recent:"近期动态",
+    i_tl1:"Kilimanjaro Regenerative 已签发 17,900 吨 CO₂e。8 吨分配至你的持仓。",
+    i_tl2:"Ember Roastery 轮次已达目标 88%。",
+    i_tl3:"Huila 水洗厂 VVB 审核已排期。",
+    i_holdings:"持仓", i_full:"完整投资组合 →",
+    i_invested:"投资额", i_spvshare:"SPV 份额", i_direq:"直接股权",
+    i_8alloc:"已分配 8 吨", i_6alloc:"已分配 6 吨", i_prio:"仅优先购买权", i_pendiss:"待签发", i_pendclose:"待交割",
+    i_liq_t:"流动性提示。",
+    i_liq_p:"非上市公司证券流动性差。本平台无二级市场。碳权益是附着于投资的合同权利，不可单独转让。",
+    q_h1:"投资详情", q_equity:"股权", q_instr:"SPV 份额（社区 SPV II）",
+    q_holding:"持股比例", q_subdate:"认购日期", q_called:"已召回资本",
+    q_alloc:"已分配", q_alloc_v:"8 吨 CO₂e", q_vintage:"（2024 年份）", q_retired:"已注销", q_remaining:"剩余",
+    q_cert:"证书与文件", q_type:"类型",
+    q_d1:"SPV 认购协议", q_contract:"合同", q_d2:"碳权益附表", q_annex:"合同附件",
+    q_d3:"权益对账单 — 2024 年份", q_ledger:"账本对账单", q_verif:"核证",
+    q_upd_t:"项目动态。",
+    q_upd_p:"你的投资与项目碳事件在同一条时间线上展示。新核证批次签发或权益重算时你会收到通知。",
+    t_bc:"机构门户", t_h1:"碳账本",
+    t_p:"每一核证吨位、其用途标签与注册处状态。下方恒等式在每次读写时校验。",
+    t_issued:"签发", t_alloc:"分配", t_retired:"注销", t_reserve:"平台预留", t_bal:"✓ 平衡",
+    t_std:"标准", t_vintage:"年份", t_lock_t:"标签锁定。",
+    t_lock_p:"标记为 <b>Scope 3 内嵌消减</b>的批次不能改为<b>注销抵消</b>，反之亦然。改用途标签需提交用途变更申请、防重复计算重新核证与法务签核。锁定在服务端强制执行，并非仅在界面上隐藏。",
+    t_expo:"敞口概览", t_commit:"基金 / SPV 承诺", t_unfunded:"未出资承诺",
+    t_talloc:"已分配吨数", t_tret:"已注销吨数", t_open:"未平仓远期合约",
+    t_fwd:"远期合约", t_counter:"对手方项目", t_contracted:"合约量", t_delivered:"已交付",
+    t_issue:"提交注销指令", t_gen:"生成披露包",
+    v_bc:"VVB 门户", v_h1:"核证队列",
+    v_s1:"已分配任务", v_s2:"平均审核周期", v_s3:"本月已签发", v_s4:"退回补正",
+    v_submitted:"提交日期", v_open:"打开", v_view:"查看",
+    v_ws:"审核工作台 — KRC-2025-A",
+    v_li1:"监测报告：<b>已附</b>",
+    v_li2:"数据完整度：<b>98.2%</b>——4 个字段被标记",
+    v_li3:"检出异常值：<b>2</b>（地块 118、204）",
+    v_li4:"审计轨迹：<b>只增不改，312 条</b>",
+    v_li5:"方法论适用性：<b>已确认</b>",
+    v_approve:"批准", v_cond:"有条件批准", v_reject:"驳回",
+    v_cross_t:"dMRV 跨活动状态",
+    v_cross_p:"若标准采纳关于跨活动互认与临时签发轨道的 dMRV 草案规则，已在其他项目完成技术审计的 dMRV 设计可在既定参数内复用。",
+    v_cross_r:"跨活动互认", v_appcheck:"需适用性检查",
+    v_interim:"临时签发轨道", v_notapp:"不适用于本批次",
+    g_bc:"平台运营", g_h1:"注册处对接状态",
+    g_p:"平台不是注册处，而是注册处状态的聚合器，并带有人工兜底路径——绝不把未确认状态报为已完成。",
+    g_verra:"Verra 注册处", g_gs:"Gold Standard 注册处",
+    g_conn1:"API 已连接 · 读写", g_conn2:"API 优先注册处 · 沙盒模式",
+    g_lastsync:"上次同步", g_ptrans:"待处理转移", g_pret:"待处理注销", g_fail:"24 小时失败调用", g_fail_v:"3（超时）",
+    g_manual:"人工兜底队列", g_instr:"指令", g_ret:"注销", g_trf:"转移",
+    g_mret:"人工注销待处理", g_await:"等待注册处确认",
+    g_note:"此队列中的注销指令<b>不会</b>向企业显示为已完成。在注册处确认前，企业披露包将其显示为待处理。",
+    g_comp:"合规工作流", g_sec:"证券",
+    g_sec1:"Reg CF 滚动上限校验——<b style=\"color:var(--up)\">生效</b>",
+    g_sec2:"发售通函模板——<b>7 个启用</b>",
+    g_sec3:"风险披露强制——<b style=\"color:var(--up)\">开启</b>",
+    g_rwa:"RWA / VASP 触发", g_rwa_s:"当前状态：", g_rwa_nt:"未触发",
+    g_rwa_p:"平台不托管私钥、不运营交易场所。代币化或钱包托管将在上线前触发单独的牌照评估。",
+    g_kyc1:"投资人 KYC 队列——<b>14 待处理</b>",
+    g_kyc2:"机构 EDD——<b>2 审核中</b>",
+    g_kyc3:"制裁筛查——<b>上次运行 09:00 UTC</b>",
+    ft_t:"ZCC 平台——演示界面。证券发行、基金管理与碳资产服务为独立法律实体。此处编制的碳披露是数据输入，不是合规意见。",
+    t_regen:"再生农业", t_removal:"清除", t_process:"加工", t_avoid:"避免", t_roast:"烘焙厂", t_inset:"内嵌消减",
+    t_farm:"种植", t_roasting:"烘焙", t_pack:"包装", t_log:"物流", t_cafe:"咖啡馆",
+    t_scope3:"Scope 3 内嵌消减", t_offset:"注销抵消", t_held:"持有", t_avail:"可用",
+    st_verified:"碳：已核证", st_est:"碳：已估算", st_notstarted:"未启动", st_review:"审核中",
+    st_status:"状态", st_closed:"已关闭", st_live:"进行中", st_draft:"草稿",
+    st_issued:"已签发", st_vvbrev:"VVB 审核中", st_datacoll:"数据采集中",
+    st_public:"公开", st_investor:"投资人", st_ndaroom:"NDA / 数据室",
+    st_open:"待办", st_answered:"已回复", st_inreview:"审核中", st_pending:"待处理",
+    st_active:"生效中", st_ontrack:"按计划", st_sched:"已排期", st_shortfall:"缺口风险",
+    st_clarif:"需补正", st_approved:"已批准", st_notsub:"未提交"
+  },
+  ar: {
+    nav_home:"الرئيسية", nav_discover:"استكشف", nav_how:"كيف يعمل", nav_carbon:"منهجية الكربون", nav_portals:"البوّابات",
+    nav_founder:"المؤسس", nav_founder_s:"أطلق حملات التمويل وأدرها", nav_investor:"المستثمر", nav_investor_s:"المحفظة وحقوق الكربون",
+    nav_institution:"المؤسسة المالية", nav_institution_s:"سجل الكربون والعقود الآجلة", nav_vvb:"جهة التحقق VVB", nav_vvb_s:"قائمة التحقق",
+    nav_admin:"الإدارة", nav_admin_s:"عمليات السجل والامتثال", nav_raise:"ابدأ التمويل",
+    h_eye:"صندوق رأس المال للقهوة الصفرية الكربون",
+    h_h1:"من خط أساس الكربون لحبة قهوة<br>إلى <span class=\"hl\">صندوق رأس مال جاهز للخروج</span>.",
+    h_p:"احتضن مشروعك على JebiStarter، واجمع التمويل من مجتمعك، واستقطب رأس المال المؤسسي، واربط حقوق كربون قابلة للتحقق بكل استثمار — ثم أبطلها في السجل مرة واحدة، ولن مرتين.",
+    h_cta1:"تصفح المشاريع", h_cta2:"كيف يعمل", h_cta3:"منهجية الكربون",
+    h_s1:"المشاريع المدرجة", h_s2:"رأس المال المغلق", h_s3:"أطنان CO₂e متحقق منها", h_s4:"أطنان CO₂e مُبطلة",
+    h_stack_t:"صندوق رأس المال بأربع طبقات",
+    h_stack_p:"يحمل كل مشروع هوية كربونية واحدة من الاحتضان حتى الخروج. انقر على أي طبقة لعرض قواعدها وحجم التمويل المعتاد وهيكل الرسوم.",
+    h_l1n:"الطبقة 01", h_l1t:"الاحتضان", h_l1p:"ترحيب على نمط JebiStarter. معالم، وخط أساس كربون مبسط، وتسخين مجتمعي. لا تتحرك الأموال في هذه المرحلة.",
+    h_l2n:"الطبقة 02", h_l2t:"تمويل المجتمع", h_l2p:"إصدار بنمط Reg CF وشركات SPV. يشترك المعجبون والداعمون المحليون عبر حساب ضمان، ويُموَّل عند الإغلاق فقط.",
+    h_l3n:"الطبقة 03", h_l3t:"رأس المال المؤسسي", h_l3p:"صناديق بنمط Jebi Capital، وغرف بيانات، وطلبات رأس مال، وشلالات carry، وتوزيع عند الخروج.",
+    h_l4n:"الطبقة 04", h_l4t:"حقوق الكربون", h_l4p:"قياس وتحقق وإبلاغ (MRV)، وتحقق VVB، وإصدار السجل، وتخصيص الاستحقاق، والإبطال وحزم الإفصاح.",
+    h_ft:"مشاريع مميزة", h_fs:"مشاريع جارية عبر طبقات رأس المال الثلاث.", h_viewall:"عرض الكل 142 →",
+    h_c1d:"التحول إلى الزراعة الحرجية والكربون العضوي عبر 2,400 مزرعة صغيرة في شمال تنزانيا.",
+    h_c2d:"استرجاع الميثان من مياه الصرف والتجفيف الشمسي لمطحن مائي تعاوني متوسط في كولومبيا.",
+    h_c3d:"تحويل محمصة إلى مضخات حرارية مع نموذج اشتراك للمستهلكين وسجل كربون مفتوح.",
+    h_nb_t:"الاستثمار ليس شراء كربون", h_nb_s:"أكثر ما يُساء فهمه حول هذه المنصة، بصراحة.",
+    h_nb_p:"لا تُنتج الأسهم أرصدة كربون. لا يوجد أصل كربوني إلا بعد أن يكون الخفض أو الإزالة <b>إضافيًا، ومقيسًا، ومتحققًا من طرف ثالث، ومسجلًا ومحوّلًا أو مُبطَلًا</b> في سجل.",
+    h_nb_btn:"اقرأ المنهجية →",
+    h_fw_t:"جدار منع الاحتساب المزدوج", h_fw_s:"مفروض على مستوى السجل، لا في ملف سياسات.",
+    h_fw_p:"كل طن متحقق يحمل وسم استخدام واحدًا فقط: <span class=\"tag\" data-i18n=\"t_scope3\">خفض ضمن النطاق 3</span> <span class=\"tag blue\" data-i18n=\"t_offset\">إبطال تعويض</span> <span class=\"tag amber\" data-i18n=\"t_held\">محتفظ به</span> <span class=\"tag green\" data-i18n=\"t_avail\">متاح</span>. تغيير الوسم يتطلب سير عمل لإعادة التحقق.",
+    h_fw_btn:"افتح سجل الكربون →",
+    d_h1:"اكتشف المشاريع",
+    d_p:"صفِّ حسب مرحلة سلسلة القيمة وطبقة رأس المال ونوع مشروع الكربون. تُعرض حالة الكربون قبل الاستثمار — لا بعده أبدًا.",
+    d_all_st:"كل المراحل", d_all_ly:"كل الطبقات", d_inc:"الاحتضان", d_com:"المجتمع", d_inst:"المؤسسي", d_cver:"كربون متحقق",
+    d_c1d:"التحول إلى الزراعة الحرجية والكربون العضوي عبر 2,400 مزرعة صغيرة.",
+    d_c2d:"استرجاع الميثان والتجفيف الشمسي في Huila، كولومبيا.",
+    d_c3d:"تحويل محمصة إلى مضخات حرارية مع نموذج اشتراك للمستهلكين.",
+    d_c4d:"نظام حاويات قابلة للإرجاع لسلاسل المقاهي المختصة في جنوب شرق آسيا.",
+    d_c5d:"شحن موحّد بالسكك الحديدية والمركبات الكهربائية للقهوة الخضراء من الميناء إلى المحمصة.",
+    d_c6d:"مجموعة مقاهي مملوكة للأعضاء مع إدارة غريات التبريد وطاقة شمسية على السطح.",
+    p_l2:"الطبقة 02 · المجتمع",
+    p_sub:"التحول إلى الزراعة الحرجية والكربون العضوي عبر 2,400 مزرعة صغيرة في شمال تنزانيا. تُغلق الجولة بعد 14 يومًا.",
+    p_prog:"تقدم التمويل", p_inv:"412 مستثمرًا", p_min:"الحد الأدنى 250$", p_invest:"استثمر الآن",
+    p_tab_ov:"نظرة عامة", p_tab_cap:"التمويل", p_tab_car:"الكربون", p_tab_upd:"التحديثات", p_tab_doc:"المستندات",
+    p_ov_t:"المشروع",
+    p_ov_p1:"تعاونية من 2,400 مزرعة تتحول من زراعة القهوة المظللة التقليدية إلى نظام حرجي متكامل بأشجار ظل بقولية وأسمدة عضوية متراكمة واحتفاظ بالتربة على الخطوط الكنتورية. التحول كثيف رأس المال في السنوات 1–3 ومربح من السنة 4.",
+    p_ov_p2:"يُستخدم رأس المال المجمع في الشتلات، وبنية تحتية للتحويل إلى سماد، وتدريب المزارعين، وسنتي جمع بيانات MRV الأوليين.",
+    p_ov_glance:"لمحة سريعة", p_stage:"مرحلة سلسلة القيمة", p_jur:"الولاية القضائية", p_jur_v:"تنزانيا",
+    p_instr:"الأداة", p_instr_v:"أسهم مجتمعية بنمط Reg CF + SPV",
+    p_ctype:"نوع مشروع الكربون", p_ctype_v:"إزالة (تربة + كتلة حيوية)",
+    p_meth:"المنهجية", p_meth_v:"إدارة الأراضي الزراعية المحسّنة بنمط VM0042",
+    p_rounds:"جولات التمويل", p_round:"الجولة", p_target:"الهدف", p_sub:"المشترك",
+    p_r1:"الجولة المجتمعية التأسيسية", p_r1i:"أسهم مباشرة بنمط Reg CF", p_r2:"الجولة المجتمعية II", p_r2i:"SPV (مجتمعي)", p_r3:"الجولة المؤسسية التالية", p_r3i:"صندوق Jebi Capital",
+    p_regcf_t:"الحد المتجدد لـ Reg CF:",
+    p_regcf_p:"استُخدم 3.4 مليون دولار من أصل 5 ملايين خلال 12 شهرًا. إذا دخل مقترح الـ 20 مليون المعتمد من SEC حيز التنفيذ، يتحدث هذا التحقق تلقائيًا ويُعاد حساب الرصيد المتبقي.",
+    p_exante:"ملف الكربون المسبق", p_annual:"الإزالة السنوية المقدرة", p_baseline:"خط الأساس",
+    p_baseline_v:"زراعة مظللة تقليدية، معاملات IPCC الافتراضية",
+    p_unc:"نطاق عدم اليقين", p_unc_v:"±30% (معاملات افتراضية، قبل الرصد)",
+    p_add:"الإضافية", p_add_v:"موثّق: التحول غير مجدٍ ماليًا دون إيرادات الكربون",
+    p_perm:"احتياطي الدوام", p_perm_v:"احتياطي مجمع 15%",
+    p_batches:"دفعات التحقق", p_batch:"الدفعة", p_monper:"فترة الرصد",
+    p_crstruct:"هيكل حقوق الكربون",
+    p_crstruct_p:"يحصل مستثمرو هذه الجولة على <b>حق شراء أولوي تعاقدي</b> على حصة محددة من الإزالات المتحقق منها، ملحق باتفاقية الاستثمار. وهو <b>ليس ورقة مالية قابلة للتنازل بشكل منفصل</b>.",
+    p_righttype:"نوع الحق", p_righttype_v:"حق شراء أولوي + حصة تخصيص 20%",
+    p_vintage:"تغطية السنوات", p_price:"صيغة التسعير", p_price_v:"حد أدنى ثابت + تعديل، محدد في الملحق",
+    p_transfer:"قابلية التنازل", p_transfer_v:"غير قابل للتنازل منفصلاً عن الأسهم",
+    p_dc_t:"إقرار منع الاحتساب المزدوج.",
+    p_dc_p:"الإزالات المتحقق منها من هذا المشروع <b>لا</b> تُطالب بها أي جهة كخفض ضمن النطاق 3. الأطنان المخصصة لحاملي حقوق الكربون مستبعدة من أي ادعاء خفض من طرف آخر. بمجرد وسم الطن لا يمكن عكس الوسم دون سير عمل لإعادة التحقق.",
+    p_m1:"مارس 2026", p_m1p:"صدرت دفعة KRC-2024-A في السجل. نُقل 17,900 طن CO₂e إلى سجل المنصة.",
+    p_m2:"يناير 2026", p_m2p:"افتُتحت الجولة المجتمعية II. اُشترك بمبلغ 500,000 دولار في أول 11 يومًا.",
+    p_m3:"سبتمبر 2025", p_m3p:"أكملت VVB التحقق من خط الأساس. تم تأكيد ملاءمة المنهجية.",
+    p_m4:"أبريل 2026 (قادم)", p_m4d:"أبريل 2026", p_m4p:"تقرير رصد KRC-2025-A مستحق لتسليمه إلى VVB.",
+    p_doc:"المستند", p_access:"مستوى الوصول", p_updated:"آخر تحديث",
+    p_doc1:"نشرة إصدار الجولة المجتمعية", p_doc2:"بيان الإفصاح عن المخاطر", p_doc3:"ملحق حقوق الكربون (نموذج)", p_doc4:"تقرير تحقق VVB KRC-2024-A", p_doc5:"حزمة العناية الواجبة الكاملة",
+    w_h1:"كيف يعمل صندوق رأس المال",
+    w_p:"أربع طبقات، ومعرّف مشروع واحد، وهوية كربونية واحدة. لا «يتخرج» المشروع من التزاماته الكربونية — بل يحملها معه.",
+    w_l1:"الطبقة 01 — الاحتضان",
+    w_l1p:"الترحيب وتتبع المعالم وخط أساس كربون مبسط. لا تتحرك الأموال ولا توجد أرصدة كربون في هذه المرحلة.",
+    w_typstage:"مرحلة المشروع المعتادة", w_typstage_v:"قبل الإيرادات حتى أول المبيعات",
+    w_typraise:"حجم التمويل المعتاد", w_fee:"رسوم المنصة", w_fee_v:"بلا رسوم في مرحلة الاحتضان",
+    w_req:"المخرجات المطلوبة",
+    w_req_v:"ملف خط أساس الكربون، وجرد مصادر الانبعاثات، ومسودة خطة الرصد",
+    w_timeline:"الجدول الزمني", w_timeline_v:"4 – 12 أسبوعًا",
+    w_l2:"الطبقة 02 — تمويل المجتمع",
+    w_l2p:"إصدار بنمط Reg CF وشركات SPV مجتمعية. يشترك المعجبون والعملاء والداعمون المحليون؛ وتُحفظ الأموال في الضمان وتُفرج عنها عند الإغلاق فقط.",
+    w_cf_fee:"رسوم نجاح Reg CF", w_cf_fee_v:"من المبلغ المجمع",
+    w_spv_fee:"رسوم تأسيس SPV", w_spv_mgmt:"رسوم إدارة SPV",
+    w_spv_mgmt_v:"<b>5%</b> + <b>10%</b> carry على SPVs من مصدر Wefunder",
+    w_roll:"الحد المتجدد", w_roll_v:"5 ملايين دولار كل 12 شهرًا (Reg CF)، يُعاد التحقق عند كل إصدار",
+    w_req2_v:"نشرة الإصدار، والإفصاح عن المخاطر، وترتيب الضمان، وملحق حقوق الكربون",
+    w_l3:"الطبقة 03 — رأس المال المؤسسي",
+    w_l3p:"صناديق وغرف بيانات وطلبات رأس مال وتقييمات NAV وشلالات carry. تُفاوض الشروط بشكل خاص وتُفصح لـ LPs فقط.",
+    w_l3raise:"2 – 30 مليون دولار لكل صندوق أو SPV",
+    w_advisory:"الاستشارات / التوزيع", w_advisory_v:"تواصل لمعرفة الشروط",
+    w_econ:"اقتصاديات الصندوق", w_econ_v:"رسوم إدارة + carry وفق اتفاقية الصندوق؛ يُعرض أساس carry في سيناريوهين صريحين",
+    w_tiers:"مستويات غرفة البيانات", w_tiers_v:"عام → بعد اتفاقية سرية → عناية واجبة كاملة (مفروضة على مستوى الاستعلام)",
+    w_req3_v:"ورقة شروط، واتفاقية SPV، وملحق حقوق الكربون، وسجل تدقيق",
+    w_l4:"الطبقة 04 — حقوق الكربون",
+    w_l4p:"قياس وتحقق وإبلاغ، وتحقق طرف ثالث، وإصدار السجل، وتخصيص الاستحقاق، والإبطال وحزم الإفصاح. تعمل هذه الطبقة عبر الصندوق بأكمله ولا تُعاد أبدًا.",
+    w_stds:"المعايير المدعومة", w_flow:"سير العمل",
+    w_flow_v:"جمع البيانات → التوحيد → ضمان الجودة → حساب الكربون → تحقق VVB → إصدار السجل",
+    w_designfee:"رسوم التصميم الهيكلي", w_designfee_v:"تُفرض على المنشأة المستثمرة أو راعي المشروع",
+    w_mrvcost:"اشتراك MRV", w_mrvcost_v:"لكل مشروع، سنويًا",
+    w_retfee:"رسوم الإبطال / الحيازة", w_retfee_v:"لكل تعليمات إبطال تُنفذ في السجل",
+    w_inv:"الثابت", w_inv_v:"الصادر = المخصص + المبطَل + احتياطي المنصة", w_inv_v2:"في كل لحظة",
+    w_sep_t:"فصل الكيانات.",
+    w_sep_p:"إصدار الأوراق المالية وإدارة الصناديق وخدمات أصول الكربون تُدار بواسطة كيانات قانونية منفصلة. المنصة بنية تحتية مشتركة؛ والعقود وتدفقات الأموال لا تختلط.",
+    c_h1:"منهجية الكربون و MRV",
+    c_p:"ما تلتزم به هذه المنصة وما لا تلتزم به. اقرأ هذا قبل أن تستثمر أو تستثمر من خلالنا.",
+    c_warn_t:"الاستثمار ليس شراء كربون.",
+    c_warn_p:"لا يوجد أصل كربوني إلا بعد أن يكون الخفض أو الإزالة إضافيًا، ومقيسًا، ومتحققًا من طرف ثالث، ومسجلًا، ومحوّلًا أو مُبطَلًا في سجل. الأسهم لا تنتج أيًا من ذلك تلقائيًا.",
+    c_wf:"سير عمل dMRV من ست خطوات",
+    c_s1:"جمع البيانات", c_s1p:"إدخال يدوي لسياقات صغار المزارعين، واستيعاب عبر API وإنترنت الأشياء للمطاحن والمحمصات والمستودعات.",
+    c_s2:"التوحيد", c_s2p:"تُربط بيانات الأنشطة بمعاملات خاصة بالمنهجية مع وسوم المصدر وقابلية التطبيق.",
+    c_s3:"ضمان الجودة", c_s3p:"كشف الحقول الناقصة، ووسم القيم الشاذة، وسجل تدقيق للإضافة فقط عند كل تعديل.",
+    c_s4:"حساب الكربون", c_s4p:"تُحسب انبعاثات خط الأساس والمشروع وفق المنهجية المختارة، مع نطاق عدم يقين صريح.",
+    c_s5:"التحقق المستقل", c_s5p:"تراجع VVB تقرير الرصد عبر بوابة مخصصة وتصدر: موافقة / موافقة مشروطة / رفض.",
+    c_s6:"إصدار السجل", c_s6p:"تُصدر الأطنان وتُنقل أو تُبطَل في السجل. تسجل المنصة الاستحقاقات؛ وهي ليست سجلاً بحد ذاتها.",
+    c_tags_t:"وسوم الاستخدام — جدار منع الاحتساب المزدوج",
+    c_tags_p:"كل طن متحقق يحمل وسمًا واحدًا في كل لحظة. تغيير الوسم سير عمل، لا قائمة منسدلة.",
+    c_th_tag:"الوسم", c_th_mean:"المعنى", c_th_sell:"هل يمكن بيعه أو إعادة تخصيصه؟",
+    c_m1:"تُطالب به المنشأة كخفض في سلسلة التوريد ضمن حدودها", c_s1no:"لا — مقفل على تلك المنشأة",
+    c_m2:"مُبطَل في السجل مقابل الانبعاثات المتبقية", c_s2no:"لا — الإبطال غير قابل للعكس",
+    c_m3:"مخصص لحامل الحق، لم يُبطَل أو يُطالب به بعد", c_s3no:"فقط عبر عقد الاستحقاق",
+    c_m4:"احتياطي المنصة أو رصيد المشروع غير المخصص", c_s4no:"نعم، وفق شروط العقد",
+    c_ret_t:"قواعد الإبطال",
+    c_r1:"يُنفذ الإبطال في السجل، لا في قاعدة بيانات المنصة. إذا تعذر الوصول إلى واجهة السجل، يدخل التعليمات حالة <b>إبطال يدوي معلق</b> — لا تعرض المنصة الإبطال كمكتمل قبل تأكيد السجل أبدًا.",
+    c_r2:"تسجل كل شهادة إبطال اسم المشروع والسنة والكمية والمعيار والغرض والمستفيد (إذا اختار المشتري ذكر اسمه).",
+    c_r3:"بعد التنفيذ يُقفل صف السجل. لا تعديل، ولا عكس، ولا حذف.",
+    c_disc_t:"الإفصاح دعم لا ضمان.",
+    c_disc_p:"تعد المنصة مجموعات بيانات الإفصاح، ولا تُصادق على امتثال إفصاحات المنشأة لأي إطار. المسؤولية النهائية على المنشأة ومراجعيها ومستشاريها القانونيين.",
+    f_bc:"بوابة المؤسس", f_h1:"مشاريعك", f_new:"+ مشروع جديد",
+    f_ly2:"الطبقة 02 · المجتمع", f_t4:"4 مهام مفتوحة", f_ly1:"الطبقة 01 · الاحتضان", f_t9:"9 مهام مفتوحة", f_ly3:"الطبقة 03 · المؤسسي", f_t2:"مهمتان مفتوحتان",
+    f_pub:"الصفحة العامة", f_mrv:"مهام MRV", f_nraising:"لم يبدأ التمويل بعد", f_base:"خط أساس الكربون", f_dr:"غرفة البيانات",
+    f_tasks_t:"المهام المفتوحة عبر جميع المشاريع", f_th_task:"المهمة", f_th_proj:"المشروع", f_th_own:"المسؤول", f_th_due:"الاستحقاق",
+    f_tk1:"رفع بيانات رصد الربع الأول 2026", f_tk2:"توقيع خطاب اعتماد VVB", f_tk3:"إكمال جرد مصادر الانبعاثات", f_tk4:"الرد على أسئلة المستثمرين", f_tk5:"تأكيد صياغة ملحق حقوق الكربون",
+    f_pr1:"Kilimanjaro Regenerative", f_pr2:"Arusha Drying Hub", f_pr3:"Ember Roastery",
+    f_you:"أنت", f_legal:"الشؤون القانونية", f_missing:"حقول ناقصة (7)",
+    f_due1:"12 مايو", f_due2:"15 مايو", f_due3:"20 مايو", f_due4:"09 مايو", f_due5:"18 مايو",
+    n_h1:"مشروع جديد",
+    n_p:"أربع خطوات. يمكنك الحفظ والخروج في أي وقت — لا يُنشر شيء قبل الإرسال للمراجعة.",
+    n_s1:"الأساسيات", n_s2:"التمويل", n_s3:"ملف الكربون", n_s4:"المراجعة",
+    n_step1:"الخطوة 1 — أساسيات المشروع",
+    n_pname:"اسم المشروع", n_pname_ph:"مثال: Arusha Drying Hub",
+    n_stage:"مرحلة سلسلة القيمة",
+    n_stage_o1:"الزراعة / الزراعة التجديدية", n_stage_o2:"المعالجة الأولية / المطحن المائي", n_stage_o3:"التحميص", n_stage_o4:"التغليف", n_stage_o5:"اللوجستيات والتخزين", n_stage_o6:"المقاهي / التجزئة",
+    n_jur:"الولاية القضائية", n_jur_ph:"الدولة / المنطقة", n_entity:"نوع الكيان القانوني", n_entity_ph:"مثال: تعاونية، شركة ذات مسؤولية محدودة",
+    n_step2:"الخطوة 2 — نية التمويل",
+    n_target:"هدف التمويل (دولار)",
+    n_instr_o1:"أسهم مجتمعية بنمط Reg CF", n_instr_o2:"SPV مجتمعي", n_instr_o3:"صندوق مؤسسي / SPV", n_instr_o4:"طرح خاص",
+    n_cright:"ربط حقوق الكربون بهذه الجولة؟",
+    n_cright_o1:"نعم — حق شراء أولوي", n_cright_o2:"نعم — حصة تخصيص", n_cright_o3:"نعم — اتفاقية شراء آجل", n_cright_o4:"ليس بعد",
+    n_note:"ربط حقوق الكربون يغير حزمة مستنداتك القانونية. يجب صياغة ومراجعة ملحق حقوق الكربون قبل نشر نشرة الإصدار.",
+    n_step3:"الخطوة 3 — ملف الكربون (نقطة البداية)",
+    n_ctype_o1:"إزالة (تربة / كتلة حيوية)", n_ctype_o2:"تفادي (ميثان، طاقة)", n_ctype_o3:"خفض ضمن سلسلة التوريد", n_ctype_o4:"غير محدد",
+    n_meth_o1:"إدارة أراضٍ زراعية بنمط VM0042", n_meth_o2:"استرجاع ميثان بنمط AMS-III.D", n_meth_o3:"كفاءة طاقة بنمط AMS-II.C", n_meth_o4:"أحتاج إرشاد المنصة",
+    n_data:"هل توجد بيانات رصد؟", n_data_o1:"نعم — أكثر من 12 شهرًا", n_data_o2:"نعم — أقل من 12 شهرًا", n_data_o3:"لا",
+    n_save:"حفظ المسودة", n_submit:"إرسال للمراجعة", n_cancel:"إلغاء",
+    i_bc:"بوابة المستثمر", i_h1:"محفظتك",
+    i_s1:"إجمالي المستثمر", i_s2:"الاستثمارات النشطة", i_s3:"حقوق كربون مخصصة", i_s4:"مُبطَل في السجل",
+    i_action:"إجراء مطلوب", i_a1:"توقيع ملحق حقوق الكربون", i_3days:"3 أيام متبقية", i_a2:"إكمال تحديث KYC", i_due20:"يستحق 20 مايو", i_a3:"تأكيد الاشتراك — Ember Roastery",
+    i_recent:"النشاط الأخير",
+    i_tl1:"صدر 17,900 طن CO₂e لـ Kilimanjaro Regenerative. خُصص 8 أطنان لحصتك.",
+    i_tl2:"وصلت جولة Ember Roastery إلى 88% من الهدف.",
+    i_tl3:"جُدولت مراجعة VVB لمطحن Huila.",
+    i_holdings:"الحيازات", i_full:"المحفظة الكاملة →",
+    i_invested:"المستثمر", i_spvshare:"حصة SPV", i_direq:"أسهم مباشرة",
+    i_8alloc:"8 أطنان مخصصة", i_6alloc:"6 أطنان مخصصة", i_prio:"حق أولوي فقط", i_pendiss:"بانتظار الإصدار", i_pendclose:"بانتظار الإغلاق",
+    i_liq_t:"تنبيه السيولة.",
+    i_liq_p:"أوراق الشركات الخاصة غير سائلة. لا يوجد سوق ثانوي على هذه المنصة. حقوق الكربون حقوق تعاقدية مرتبطة باستثمارك ولا يمكن التنازل عنها بشكل منفصل.",
+    q_h1:"تفاصيل الاستثمار", q_equity:"الأسهم", q_instr:"حصة SPV (المجتمعي SPV II)",
+    q_holding:"الحصة", q_subdate:"تاريخ الاشتراك", q_called:"رأس المال المستدعى",
+    q_alloc:"مخصص", q_alloc_v:"8 أطنان CO₂e", q_vintage:"(سنة 2024)", q_retired:"مُبطَل", q_remaining:"متبقٍ",
+    q_cert:"الشهادات والمستندات", q_type:"النوع",
+    q_d1:"اتفاقية اشتراك SPV", q_contract:"عقد", q_d2:"ملحق حقوق الكربون", q_annex:"ملحق عقد",
+    q_d3:"بيان استحقاق — سنة 2024", q_ledger:"كشف سجل", q_verif:"تحقق",
+    q_upd_t:"تحديثات المشروع.",
+    q_upd_p:"يظهر استثمارك وأحداث الكربون للمشروع على خط زمني مشترك. سيتم إشعارك عند إصدار دفعة تحقق جديدة وعند إعادة حساب الاستحقاقات.",
+    t_bc:"بوابة المؤسسات", t_h1:"سجل الكربون",
+    t_p:"كل طن متحقق ووسم استخدام وحالته في السجل. يُتحقق من المعادلة أدناه عند كل قراءة وكل كتابة.",
+    t_issued:"الصادر", t_alloc:"المخصص", t_retired:"المبطَل", t_reserve:"احتياطي المنصة", t_bal:"✓ متوازن",
+    t_std:"المعيار", t_vintage:"السنة", t_lock_t:"قفل الوسم.",
+    t_lock_p:"الدفعة الموسومة <b>خفض ضمن النطاق 3</b> لا يمكن تحويلها إلى <b>إبطال تعويض</b>، والعكس صحيح. تغيير وسم الاستخدام يتطلب طلب تغيير استخدام، وإعادة تحقق من الاحتساب المزدوج، وتوقيعًا قانونيًا. القفل مفروض على الخادم، لا مخفي في الواجهة.",
+    t_expo:"ملخص التعرض", t_commit:"تعهدات الصندوق / SPV", t_unfunded:"التعهد غير الممول",
+    t_talloc:"الأطنان المخصصة", t_tret:"الأطنان المبطلة", t_open:"العقود الآجلة المفتوحة",
+    t_fwd:"العقود الآجلة", t_counter:"مشروع الطرف المقابل", t_contracted:"المتعاقد", t_delivered:"المُسلَّم",
+    t_issue:"إصدار تعليمات إبطال", t_gen:"إنشاء حزمة الإفصاح",
+    v_bc:"بوابة VVB", v_h1:"قائمة التحقق",
+    v_s1:"المهام المسندة", v_s2:"متوسط دورة المراجعة", v_s3:"صدر هذا الشهر", v_s4:"أُعيدت للتوضيح",
+    v_submitted:"تاريخ الإرسال", v_open:"فتح", v_view:"عرض",
+    v_ws:"مساحة المراجعة — KRC-2025-A",
+    v_li1:"تقرير الرصد: <b>مرفق</b>",
+    v_li2:"اكتمال البيانات: <b>98.2%</b> — 4 حقول معلمة",
+    v_li3:"قيم شاذة: <b>2</b> (قطعة 118، قطعة 204)",
+    v_li4:"سجل التدقيق: <b>إضافة فقط، 312 قيدًا</b>",
+    v_li5:"ملاءمة المنهجية: <b>مؤكدة</b>",
+    v_approve:"موافقة", v_cond:"موافقة مشروطة", v_reject:"رفض",
+    v_cross_t:"حالة الأنشطة المتقاطعة لـ dMRV",
+    v_cross_p:"إذا اعتُمدت قواعد dMRV المسودة حول الاعتراف المتبادل بين الأنشطة ومسارات الإصدار المؤقت، يمكن إعادة استخدام تصميم dMRV مدقق تقنيًا في مشروع آخر ضمن معاملات محددة.",
+    v_cross_r:"الاعتراف المتقاطع", v_appcheck:"يتطلب فحص الملاءمة",
+    v_interim:"مسار الإصدار المؤقت", v_notapp:"لا ينطبق على هذه الدفعة",
+    g_bc:"عمليات المنصة", g_h1:"حالة التكامل مع السجل",
+    g_p:"المنصة ليست سجلاً. هي مجمّع لحالة السجل، مع مسار بديل يدوي لا يُبلّغ أبدًا عن حالات غير مؤكدة كمكتملة.",
+    g_verra:"سجل Verra", g_gs:"سجل Gold Standard",
+    g_conn1:"API متصل · قراءة وكتابة", g_conn2:"سجل API أولاً · وضع تجريبي",
+    g_lastsync:"آخر مزامنة", g_ptrans:"تحويلات معلقة", g_pret:"إبطالات معلقة", g_fail:"استدعاءات فاشلة (24 ساعة)", g_fail_v:"3 (مهلة)",
+    g_manual:"قائمة الاحتياط اليدوي", g_instr:"التعليمات", g_ret:"إبطال", g_trf:"تحويل",
+    g_mret:"إبطال يدوي معلق", g_await:"بانتظار تأكيد السجل",
+    g_note:"تعليمات الإبطال في هذه القائمة <b>لا</b> تُعرض للمنشأة كمكتملة. ستظهرها حزمة الإفصاح معلقة حتى يؤكد السجل.",
+    g_comp:"سير عمل الامتثال", g_sec:"الأوراق المالية",
+    g_sec1:"التحقق من الحد المتجدد لـ Reg CF — <b style=\"color:var(--up)\">مفعّل</b>",
+    g_sec2:"قوالب نشرة الإصدار — <b>7 مفعلة</b>",
+    g_sec3:"فرض الإفصاح عن المخاطر — <b style=\"color:var(--up)\">مفعّل</b>",
+    g_rwa:"شرط RWA / VASP", g_rwa_s:"الحالة الحالية:", g_rwa_nt:"غير مفعّل",
+    g_rwa_p:"المنصة لا تحفظ المفاتيح الخاصة ولا تدير سوق تداول. ترميز الأصول أو حفظ المحافظ سيستلزم تقييم ترخيص منفصل قبل الإطلاق.",
+    g_kyc1:"قائمة KYC للمستثمرين — <b>14 معلقًا</b>",
+    g_kyc2:"العناية الواجبة المعززة المؤسسية — <b>2 قيد المراجعة</b>",
+    g_kyc3:"فرز العقوبات — <b>آخر تشغيل 09:00 UTC</b>",
+    ft_t:"منصة ZCC — واجهة عرض. إصدار الأوراق المالية وإدارة الصناديق وخدمات أصول الكربون كيانات قانونية منفصلة. إفصاحات الكربون المعدة هنا مدخلات بيانات، لا آراء امتثال.",
+    t_regen:"تجديدية", t_removal:"إزالة", t_process:"معالجة", t_avoid:"تفادي", t_roast:"محمصة", t_inset:"خفض داخلي",
+    t_farm:"الزراعة", t_roasting:"التحميص", t_pack:"التغليف", t_log:"اللوجستيات", t_cafe:"المقاهي",
+    t_scope3:"خفض ضمن النطاق 3", t_offset:"إبطال تعويض", t_held:"محتفظ به", t_avail:"متاح",
+    st_verified:"الكربون: متحقق", st_est:"الكربون: مُقدَّر", st_notstarted:"لم يبدأ", st_review:"قيد المراجعة",
+    st_status:"الحالة", st_closed:"مغلقة", st_live:"جارية", st_draft:"مسودة",
+    st_issued:"صادرة", st_vvbrev:"قيد مراجعة VVB", st_datacoll:"جمع البيانات",
+    st_public:"عام", st_investor:"مستثمر", st_ndaroom:"اتفاقية سرية / غرفة بيانات",
+    st_open:"مفتوحة", st_answered:"تم الرد", st_inreview:"قيد المراجعة", st_pending:"معلق",
+    st_active:"نشط", st_ontrack:"على المسار", st_sched:"مجدول", st_shortfall:"خطر عجز",
+    st_clarif:"يتطلب توضيح", st_approved:"مُوافق عليه", st_notsub:"لم يُرسل"
+  }
+  };
+
+  var LANG_LABEL = { en: "EN", zh: "中文", ar: "ع" };
+
+  function setLang(lang) {
+    var dict = I18N[lang];
+    var nodes = document.querySelectorAll("[data-i18n]");
+    for (var i = 0; i < nodes.length; i++) {
+      var el = nodes[i];
+      if (!el.dataset.orig) el.dataset.orig = el.innerHTML;
+      var key = el.getAttribute("data-i18n");
+      if (lang === "en" || !dict || dict[key] == null) {
+        el.innerHTML = el.dataset.orig;
+      } else {
+        el.innerHTML = dict[key];
+      }
+    }
+    var phs = document.querySelectorAll("[data-i18n-ph]");
+    for (var j = 0; j < phs.length; j++) {
+      var p = phs[j];
+      var pk = p.getAttribute("data-i18n-ph");
+      if (!p.dataset.origPh) p.dataset.origPh = p.getAttribute("placeholder") || "";
+      p.placeholder = (dict && dict[pk] != null) ? dict[pk] : p.dataset.origPh;
+    }
+    document.documentElement.lang = lang === "zh" ? "zh-CN" : lang;
+    document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
+    var btn = document.getElementById("langbtn");
+    if (btn) btn.textContent = LANG_LABEL[lang] || "EN";
+    var opts = document.querySelectorAll("#langdd a[data-lang]");
+    for (var k = 0; k < opts.length; k++) opts[k].classList.toggle("on", opts[k].getAttribute("data-lang") === lang);
+    try { localStorage.setItem("zcc_lang", lang); } catch (e) {}
+    try { window.dispatchEvent(new Event("langchange")); } catch (e) {}
+  }
+
+  window.ZCC_LANG = setLang;
+
+  document.addEventListener("click", function (e) {
+    var opt = e.target.closest ? e.target.closest("#langdd a[data-lang]") : null;
+    if (opt) setLang(opt.getAttribute("data-lang"));
+  });
+
+  var saved = "en";
+  try { saved = localStorage.getItem("zcc_lang") || "en"; } catch (e) {}
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", function () { setLang(saved); });
+  } else {
+    setLang(saved);
+  }
+})();
+</script>
+</body>
+</html>
