@@ -372,6 +372,7 @@
       style="width:100%;aspect-ratio:16/9;border-radius:12px;background:#000;display:block">
       <source id="intro-src" src="assets/video/zcc_intro_en.mp4" type="video/mp4">
     </video>
+    <div class="small muted" id="vdur" style="margin-top:10px"></div>
   </div>
 
   <div class="divider"></div>
@@ -1915,9 +1916,14 @@
   var video = document.getElementById("intro-video");
   var src = document.getElementById("intro-src");
   var chips = document.querySelectorAll("#vlangdd .vlang");
+  var meta = document.getElementById("vdur");
+  var DUR = { en: "9:39", zh: "9:22", ar: "12:12" };
+  var DLBL = { en: "Runtime ", zh: "片长 ", ar: "المدة " };
+  var DLBL2 = { en: " · 23 chapters, one per screen", zh: " · 23 个章节，逐屏对应", ar: " · 23 فصلاً، شاشة لكل فصل" };
   function mark(l) {
     for (var i = 0; i < chips.length; i++)
       chips[i].classList.toggle("on", chips[i].getAttribute("data-vlang") === l);
+    if (meta) meta.textContent = DLBL[l] + DUR[l] + DLBL2[l];
   }
   function setVideoLang(l, keepTime) {
     var t = "assets/video/zcc_intro_" + l + ".mp4";
