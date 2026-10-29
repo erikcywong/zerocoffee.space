@@ -224,6 +224,33 @@
   .chip:hover{border-color:var(--accent);color:var(--text)}
   .chip.on{background:var(--accent);border-color:var(--accent);color:#fff}
 
+  /* ---------- discover filter bar ---------- */
+  .dfilter{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:4px 0 22px}
+  .dfilter #d-search{flex:1 1 260px;max-width:340px;padding:9px 13px;font-size:13px}
+  .dfilter #d-sort{width:auto;min-width:170px;padding:9px 13px;font-size:13px}
+  .dfilter #d-count{margin-left:auto;font-size:12px;letter-spacing:.02em}
+  #d-grid .pcard .desc{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+
+  /* ---------- portal strip on project page ---------- */
+  .pstrip{margin:26px 0 0;padding:18px 20px;border:1px solid var(--line);border-radius:var(--radius);
+    background:linear-gradient(180deg,rgba(29,155,240,.05),transparent)}
+  .pstrip-h{display:flex;gap:12px;align-items:baseline;flex-wrap:wrap;margin-bottom:14px}
+  .pstrip-h b{font-size:14px}
+  .pstrip-g{display:grid;grid-template-columns:repeat(auto-fit,minmax(178px,1fr));gap:10px}
+  .pstrip-g a{display:block;background:var(--panel);border:1px solid var(--line-soft);border-radius:12px;
+    padding:13px 14px;transition:.15s}
+  .pstrip-g a:hover{border-color:rgba(29,155,240,.45);transform:translateY(-2px)}
+  .pstrip-g .pn{display:block;font-size:13px;font-weight:700;color:var(--text);margin-bottom:3px}
+  .pstrip-g .ps{display:block;font-size:11.5px;color:var(--muted);line-height:1.4}
+  .pstrip-g a.na{opacity:.45;pointer-events:none}
+
+  /* ---------- portal context banner ---------- */
+  .ctxbar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:0 0 22px;padding:12px 16px;
+    border:1px solid rgba(29,155,240,.35);border-radius:12px;background:var(--accent-dim);font-size:13px}
+  .ctxbar .mono{font-size:11px;color:var(--muted)}
+  .ctxbar a{color:var(--accent);font-weight:700}
+  [hidden]{display:none !important}
+
   /* ---------- forms ---------- */
   label.f{display:block;font-size:12px;font-weight:700;color:var(--muted);margin:0 0 6px;letter-spacing:.03em}
   input[type=text],input[type=number],select,textarea{
@@ -323,7 +350,7 @@
   </div>
 
   <div class="grid g4" style="margin:38px 0 8px">
-    <div class="card stat"><div class="n">142</div><div class="l" data-i18n="h_s1">Projects onboarded</div></div>
+    <div class="card stat"><div class="n">120</div><div class="l" data-i18n="h_s1">Projects onboarded</div></div>
     <div class="card stat"><div class="n"><em>$86.4M</em></div><div class="l" data-i18n="h_s2">Capital closed</div></div>
     <div class="card stat"><div class="n">214,000</div><div class="l" data-i18n="h_s3">tCO₂e verified</div></div>
     <div class="card stat"><div class="n" style="color:var(--up)">61,800</div><div class="l" data-i18n="h_s4">tCO₂e retired</div></div>
@@ -382,32 +409,10 @@
       <h2 style="margin-bottom:4px" data-i18n="h_ft">Featured projects</h2>
       <p class="muted small" style="margin:0" data-i18n="h_fs">Live across all three capital layers.</p>
     </div>
-    <a class="btn ghost sm" href="#/discover" data-i18n="h_viewall">View all 142 →</a>
+    <a class="btn ghost sm" href="#/discover" data-i18n="h_viewall">View all 120 →</a>
   </div>
 
-  <div class="grid g3" style="margin-top:18px">
-    <a class="pcard" href="#/project">
-      <div style="display:flex;gap:6px;flex-wrap:wrap"><span class="tag green" data-i18n="t_regen">Regenerative</span><span class="tag blue" data-i18n="t_removal">Removal</span></div>
-      <h3>Kilimanjaro Regenerative Coffee Cooperative</h3>
-      <p class="desc" data-i18n="h_c1d">Agroforestry and soil-carbon transition across 2,400 smallholder farms in northern Tanzania.</p>
-      <div class="bar"><i style="width:72%"></i></div>
-      <div class="meta"><span>$864,000 / $1.2M</span><span style="color:var(--up)" data-i18n="st_verified">Carbon: Verified</span></div>
-    </a>
-    <a class="pcard" href="#/project">
-      <div style="display:flex;gap:6px;flex-wrap:wrap"><span class="tag amber" data-i18n="t_process">Processing</span><span class="tag blue" data-i18n="t_avoid">Avoidance</span></div>
-      <h3>Huila Wet-Mill Methane Capture</h3>
-      <p class="desc" data-i18n="h_c2d">Wastewater methane recovery and solar drying for a mid-size cooperative wet mill in Colombia.</p>
-      <div class="bar"><i style="width:45%"></i></div>
-      <div class="meta"><span>$540,000 / $1.2M</span><span style="color:var(--amber)" data-i18n="st_est">Carbon: Estimated</span></div>
-    </a>
-    <a class="pcard" href="#/project">
-      <div style="display:flex;gap:6px;flex-wrap:wrap"><span class="tag" data-i18n="t_roast">Roastery</span><span class="tag green" data-i18n="t_inset">Inset</span></div>
-      <h3>Ember Roastery Electrification</h3>
-      <p class="desc" data-i18n="h_c3d">Heat-pump roastery retrofit with a consumer subscription model and open carbon ledger.</p>
-      <div class="bar"><i style="width:88%"></i></div>
-      <div class="meta"><span>$1.06M / $1.2M</span><span style="color:var(--up)" data-i18n="st_verified">Carbon: Verified</span></div>
-    </a>
-  </div>
+  <div class="grid g3" id="d-featured" style="margin-top:18px"></div>
 
   <div class="divider"></div>
 
@@ -430,90 +435,83 @@
 <!-- ============================ DISCOVER ============================ -->
 <section id="page-discover" class="page">
   <h1 data-i18n="d_h1">Discover projects</h1>
-  <p class="muted" style="max-width:620px" data-i18n="d_p">Filter by value-chain stage, capital layer and carbon project type. Carbon status is shown before you invest — never after.</p>
+  <p class="muted" style="max-width:660px">
+    <span data-i18n="d_p">Filter by value-chain stage, capital layer and carbon project type. Carbon status is shown before you invest — never after.</span>
+    <b id="d-total" class="mono" style="color:var(--accent)">120</b>
+    <span data-i18n="d_count_all">projects · 6 verticals · 4 capital layers</span>
+  </p>
 
-  <div class="chips">
-    <button class="chip on" data-i18n="d_all_st">All stages</button>
-    <button class="chip" data-i18n="t_farm">Farming</button>
-    <button class="chip" data-i18n="t_process">Processing</button>
-    <button class="chip" data-i18n="t_roasting">Roasting</button>
-    <button class="chip" data-i18n="t_pack">Packaging</button>
-    <button class="chip" data-i18n="t_log">Logistics</button>
-    <button class="chip" data-i18n="t_cafe">Café</button>
-  </div>
-  <div class="chips" style="margin-top:0">
-    <button class="chip on" data-i18n="d_all_ly">All layers</button>
-    <button class="chip" data-i18n="d_inc">Incubation</button>
-    <button class="chip" data-i18n="d_com">Community</button>
-    <button class="chip" data-i18n="d_inst">Institutional</button>
-    <button class="chip" data-i18n="d_cver">Carbon verified</button>
+  <div id="d-filters">
+    <div class="chips" data-row="vertical">
+      <button class="chip on" data-group="vertical" data-val="all" data-i18n="d_all_st">All stages</button>
+      <button class="chip" data-group="vertical" data-val="farm" data-i18n="t_farm">Farming</button>
+      <button class="chip" data-group="vertical" data-val="process" data-i18n="t_process">Processing</button>
+      <button class="chip" data-group="vertical" data-val="roast" data-i18n="t_roasting">Roasting</button>
+      <button class="chip" data-group="vertical" data-val="pack" data-i18n="t_pack">Packaging</button>
+      <button class="chip" data-group="vertical" data-val="log" data-i18n="t_log">Logistics</button>
+      <button class="chip" data-group="vertical" data-val="cafe" data-i18n="t_cafe">Café</button>
+    </div>
+    <div class="chips" data-row="layer">
+      <button class="chip on" data-group="layer" data-val="all" data-i18n="d_all_ly">All layers</button>
+      <button class="chip" data-group="layer" data-val="1" data-i18n="d_inc">Incubation</button>
+      <button class="chip" data-group="layer" data-val="2" data-i18n="d_com">Community</button>
+      <button class="chip" data-group="layer" data-val="3" data-i18n="d_inst">Institutional</button>
+      <button class="chip" data-group="layer" data-val="4" data-i18n="d_cver">Carbon verified</button>
+    </div>
+    <div class="chips" data-row="carbon">
+      <button class="chip on" data-group="carbon" data-val="all" data-i18n="d_all_carbon">All carbon types</button>
+      <button class="chip" data-group="carbon" data-val="removal" data-i18n="t_removal">Removal</button>
+      <button class="chip" data-group="carbon" data-val="avoidance" data-i18n="t_avoid">Avoidance</button>
+      <button class="chip" data-group="carbon" data-val="inset" data-i18n="t_inset">Inset</button>
+    </div>
+    <div class="dfilter">
+      <input id="d-search" type="search" data-i18n-ph="d_search" placeholder="Search project, country or ID" autocomplete="off">
+      <select id="d-sort">
+        <option value="prog" data-i18n="d_sort_prog">Funding progress</option>
+        <option value="tonnes" data-i18n="d_sort_tonnes">Carbon volume</option>
+        <option value="name" data-i18n="d_sort_name">Name (A–Z)</option>
+      </select>
+      <span id="d-count" class="mono small muted"></span>
+    </div>
   </div>
 
-  <div class="grid g3">
-    <a class="pcard" href="#/project">
-      <div style="display:flex;gap:6px;flex-wrap:wrap"><span class="tag green" data-i18n="t_regen">Regenerative</span><span class="tag blue" data-i18n="t_removal">Removal</span></div>
-      <h3>Kilimanjaro Regenerative Coffee Cooperative</h3>
-      <p class="desc" data-i18n="d_c1d">Agroforestry and soil-carbon transition across 2,400 smallholder farms.</p>
-      <div class="bar"><i style="width:72%"></i></div>
-      <div class="meta"><span>$864,000 / $1.2M</span><span style="color:var(--up)" data-i18n="st_verified">Carbon: Verified</span></div>
-    </a>
-    <a class="pcard" href="#/project">
-      <div style="display:flex;gap:6px;flex-wrap:wrap"><span class="tag amber" data-i18n="t_process">Processing</span><span class="tag blue" data-i18n="t_avoid">Avoidance</span></div>
-      <h3>Huila Wet-Mill Methane Capture</h3>
-      <p class="desc" data-i18n="d_c2d">Wastewater methane recovery and solar drying in Huila, Colombia.</p>
-      <div class="bar"><i style="width:45%"></i></div>
-      <div class="meta"><span>$540,000 / $1.2M</span><span style="color:var(--amber)" data-i18n="st_est">Carbon: Estimated</span></div>
-    </a>
-    <a class="pcard" href="#/project">
-      <div style="display:flex;gap:6px;flex-wrap:wrap"><span class="tag" data-i18n="t_roast">Roastery</span><span class="tag green" data-i18n="t_inset">Inset</span></div>
-      <h3>Ember Roastery Electrification</h3>
-      <p class="desc" data-i18n="d_c3d">Heat-pump roastery retrofit with a consumer subscription model.</p>
-      <div class="bar"><i style="width:88%"></i></div>
-      <div class="meta"><span>$1.06M / $1.2M</span><span style="color:var(--up)" data-i18n="st_verified">Carbon: Verified</span></div>
-    </a>
-    <a class="pcard" href="#/project">
-      <div style="display:flex;gap:6px;flex-wrap:wrap"><span class="tag" data-i18n="t_pack">Packaging</span><span class="tag amber" data-i18n="st_notstarted">Not started</span></div>
-      <h3>Reusable Loop Packaging Co.</h3>
-      <p class="desc" data-i18n="d_c4d">Returnable container system for specialty café chains in Southeast Asia.</p>
-      <div class="bar"><i style="width:18%"></i></div>
-      <div class="meta"><span>$90,000 / $500,000</span><span data-i18n="st_notstarted">Not started</span></div>
-    </a>
-    <a class="pcard" href="#/project">
-      <div style="display:flex;gap:6px;flex-wrap:wrap"><span class="tag amber" data-i18n="t_log">Logistics</span><span class="tag blue" data-i18n="t_avoid">Avoidance</span></div>
-      <h3>Andes Green Freight Corridor</h3>
-      <p class="desc" data-i18n="d_c5d">Consolidated rail-and-EV freight for green coffee moving from port to roastery.</p>
-      <div class="bar"><i style="width:34%"></i></div>
-      <div class="meta"><span>$680,000 / $2M</span><span style="color:var(--accent)" data-i18n="st_review">Under review</span></div>
-    </a>
-    <a class="pcard" href="#/project">
-      <div style="display:flex;gap:6px;flex-wrap:wrap"><span class="tag" data-i18n="t_cafe">Café</span><span class="tag green" data-i18n="t_inset">Inset</span></div>
-      <h3>Northwind Café Collective</h3>
-      <p class="desc" data-i18n="d_c6d">Member-owned café group with refrigerant management and rooftop solar.</p>
-      <div class="bar"><i style="width:61%"></i></div>
-      <div class="meta"><span>$305,000 / $500,000</span><span style="color:var(--up)" data-i18n="st_verified">Carbon: Verified</span></div>
-    </a>
-  </div>
+  <div class="grid g3" id="d-grid"></div>
+  <p id="d-empty" hidden class="muted small" style="text-align:center;padding:40px 0" data-i18n="d_none">No projects match these filters.</p>
+  <div style="text-align:center;margin-top:24px"><button class="btn ghost" id="d-more" hidden data-i18n="d_more">Show more</button></div>
 </section>
 
 <!-- ============================ PROJECT DETAIL ============================ -->
 <section id="page-project" class="page">
-  <div class="breadcrumb"><a href="#/discover" data-i18n="nav_discover">Discover</a> / Kilimanjaro Regenerative Coffee Cooperative</div>
+  <div class="breadcrumb"><a href="#/discover" data-i18n="nav_discover">Discover</a> / <span id="pj_bc">Kilimanjaro Regenerative Coffee Cooperative</span></div>
 
   <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:20px;flex-wrap:wrap">
     <div style="max-width:680px">
-      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px" id="pj_tags">
         <span class="tag green" data-i18n="t_regen">Regenerative</span><span class="tag blue" data-i18n="t_removal">Removal</span><span class="tag" data-i18n="p_l2">Layer 02 · Community</span>
       </div>
-      <h1 style="margin-bottom:8px;font-size:clamp(26px,3vw,38px)">Kilimanjaro Regenerative Coffee Cooperative</h1>
-      <p class="muted" style="margin:0" data-i18n="p_sub">Agroforestry and soil-carbon transition across 2,400 smallholder farms in northern Tanzania. Round closes in 14 days.</p>
+      <h1 id="pj_title" style="margin-bottom:8px;font-size:clamp(26px,3vw,38px)">Kilimanjaro Regenerative Coffee Cooperative</h1>
+      <p class="muted" id="pj_sub" style="margin:0" data-i18n="p_sub">Agroforestry and soil-carbon transition across 2,400 smallholder farms in northern Tanzania. Round closes in 14 days.</p>
+      <p class="small mono muted" id="pj_id" style="margin:10px 0 0;font-size:11px;letter-spacing:.06em">ZCC-0001</p>
     </div>
     <div class="card" style="min-width:290px">
       <div class="mono muted" style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px" data-i18n="p_prog">Raise progress</div>
-      <div style="font-size:27px;font-weight:800;letter-spacing:-.03em"><span style="color:var(--accent)">$864,000</span> <span class="muted" style="font-size:15px;font-weight:600">/ $1.2M</span></div>
-      <div class="bar" style="margin:12px 0 14px"><i style="width:72%"></i></div>
-      <div class="small muted" style="display:flex;justify-content:space-between"><span data-i18n="p_inv">412 investors</span><span data-i18n="p_min">Min. $250</span></div>
+      <div style="font-size:27px;font-weight:800;letter-spacing:-.03em"><span style="color:var(--accent)" id="pj_raised">$864,000</span> <span class="muted" style="font-size:15px;font-weight:600">/ <span id="pj_target">$1.2M</span></span></div>
+      <div class="bar" style="margin:12px 0 14px"><i id="pj_bar" style="width:72%"></i></div>
+      <div class="small muted" style="display:flex;justify-content:space-between"><span id="pj_inv">412 investors</span><span id="pj_min">Min. $250</span></div>
       <a class="btn primary" href="#" style="width:100%;justify-content:center;margin-top:16px" data-i18n="p_invest">Invest now</a>
     </div>
+  </div>
+
+  <div class="pstrip">
+    <div class="pstrip-h">
+      <b data-i18n="pr_t">Open in a portal</b>
+      <span class="muted small" data-i18n="pr_s">This project lives in all five consoles. Pick the one you operate.</span>
+    </div>
+    <div class="pstrip-g" id="pj_portals"></div>
+  </div>
+
+  <div class="note" id="pj_note" hidden>
+    <span data-i18n="pj_note_p">Figures on this page are drawn from the demo dataset. Overview and capital narrative are illustrative for this project.</span>
   </div>
 
   <div class="tabs">
@@ -535,11 +533,11 @@
         <h3 data-i18n="p_ov_glance">At a glance</h3>
         <table>
           <tbody>
-            <tr><td class="muted" data-i18n="p_stage">Value-chain stage</td><td><b data-i18n="t_farm">Farming</b></td></tr>
-            <tr><td class="muted" data-i18n="p_jur">Jurisdiction</td><td><b data-i18n="p_jur_v">Tanzania</b></td></tr>
-            <tr><td class="muted" data-i18n="p_instr">Instrument</td><td data-i18n="p_instr_v">Reg CF-style community equity + SPV</td></tr>
-            <tr><td class="muted" data-i18n="p_ctype">Carbon project type</td><td><b data-i18n="p_ctype_v">Removal (soil + biomass)</b></td></tr>
-            <tr><td class="muted" data-i18n="p_meth">Methodology</td><td data-i18n="p_meth_v">VM0042-style improved agricultural land management</td></tr>
+            <tr><td class="muted" data-i18n="p_stage">Value-chain stage</td><td><b id="pj_stage">Farming</b></td></tr>
+            <tr><td class="muted" data-i18n="p_jur">Jurisdiction</td><td><b id="pj_jur">Tanzania</b></td></tr>
+            <tr><td class="muted" data-i18n="p_instr">Instrument</td><td id="pj_instr">Reg CF-style community equity + SPV</td></tr>
+            <tr><td class="muted" data-i18n="p_ctype">Carbon project type</td><td><b id="pj_ctype">Removal (soil + biomass)</b></td></tr>
+            <tr><td class="muted" data-i18n="p_meth">Methodology</td><td id="pj_meth">VM0042-style improved agricultural land management</td></tr>
           </tbody>
         </table>
       </div>
@@ -569,7 +567,7 @@
         <h3 data-i18n="p_exante">Ex-ante carbon profile</h3>
         <table>
           <tbody>
-            <tr><td class="muted" data-i18n="p_annual">Estimated annual removal</td><td><b>18,400 tCO₂e / yr</b></td></tr>
+            <tr><td class="muted" data-i18n="p_annual">Estimated annual removal</td><td><b id="pj_annual">18,400 tCO₂e / yr</b></td></tr>
             <tr><td class="muted" data-i18n="p_baseline">Baseline</td><td data-i18n="p_baseline_v">Conventional shade-grown, default IPCC factors</td></tr>
             <tr><td class="muted" data-i18n="p_unc">Uncertainty band</td><td data-i18n="p_unc_v">±30% (default factors, pre-monitoring)</td></tr>
             <tr><td class="muted" data-i18n="p_add">Additionality</td><td data-i18n="p_add_v">Documented: transition not financially viable without carbon revenue</td></tr>
@@ -762,6 +760,7 @@
 
 <!-- ============================ FOUNDER DASHBOARD ============================ -->
 <section id="page-founder" class="page">
+  <div class="ctxbar" id="ctx-founder" hidden></div>
   <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap">
     <div>
       <div class="breadcrumb" style="margin-bottom:6px" data-i18n="f_bc">Founder portal</div>
@@ -936,6 +935,7 @@
 
 <!-- ============================ INVESTOR DASHBOARD ============================ -->
 <section id="page-investor" class="page">
+  <div class="ctxbar" id="ctx-investor" hidden></div>
   <div class="breadcrumb" data-i18n="i_bc">Investor portal</div>
   <h1 data-i18n="i_h1">Your portfolio</h1>
 
@@ -1045,6 +1045,7 @@
 
 <!-- ============================ INSTITUTION ============================ -->
 <section id="page-institution" class="page">
+  <div class="ctxbar" id="ctx-institution" hidden></div>
   <div class="breadcrumb" data-i18n="t_bc">Institution portal</div>
   <h1 data-i18n="t_h1">Carbon ledger</h1>
   <p class="muted" style="max-width:660px" data-i18n="t_p">Every verified tonne, its use tag and its registry state. The equation below is validated on every read and every write.</p>
@@ -1130,6 +1131,7 @@
 
 <!-- ============================ VVB ============================ -->
 <section id="page-vvb" class="page">
+  <div class="ctxbar" id="ctx-vvb" hidden></div>
   <div class="breadcrumb" data-i18n="v_bc">VVB portal</div>
   <h1 data-i18n="v_h1">Verification queue</h1>
 
@@ -1201,6 +1203,7 @@
 
 <!-- ============================ ADMIN ============================ -->
 <section id="page-admin" class="page">
+  <div class="ctxbar" id="ctx-admin" hidden></div>
   <div class="breadcrumb" data-i18n="g_bc">Platform operations</div>
   <h1 data-i18n="g_h1">Registry integration status</h1>
   <p class="muted" style="max-width:660px" data-i18n="g_p">The platform is not a registry. It is an aggregator of registry state, with a manual fallback path that never reports unconfirmed states as complete.</p>
@@ -1299,7 +1302,14 @@
   };
 
   function navigate() {
-    var hash = location.hash.replace(/^#/, '') || '/home';
+    var raw = location.hash.replace(/^#/, '') || '/home';
+    var qi = raw.indexOf('?');
+    var hash = qi === -1 ? raw : raw.slice(0, qi);
+    var params = {};
+    if (qi !== -1) {
+      var sp = new URLSearchParams(raw.slice(qi + 1));
+      sp.forEach(function (v, k) { params[k] = v; });
+    }
     if (hash.length > 1 && hash.slice(-1) === '/') hash = hash.slice(0, -1);
     var id = ROUTES[hash] || 'page-home';
 
@@ -1310,6 +1320,7 @@
     target.classList.add('active');
 
     if (id === 'page-project') resetTabs();
+    if (window.ZCC_DETAIL) window.ZCC_DETAIL.apply(id, params);
     window.scrollTo(0, 0);
 
     var seg = '/' + (hash.split('/')[1] || 'home');
@@ -1370,7 +1381,7 @@
     h_l2n:"层级 02", h_l2t:"社区募资", h_l2p:"Reg CF 式发行与 SPV。粉丝与本地支持者通过托管认购，仅在交割时放款。",
     h_l3n:"层级 03", h_l3t:"机构资本", h_l3p:"Jebi Capital 式基金、数据室、出资召回、carry 瀑布与退出分配。",
     h_l4n:"层级 04", h_l4t:"碳权益", h_l4p:"MRV、VVB 核证、注册处签发、权益分配、注销与披露包。",
-    h_ft:"精选项目", h_fs:"横跨三层资本栈的进行中项目。", h_viewall:"查看全部 142 →",
+    h_ft:"精选项目", h_fs:"横跨三层资本栈的进行中项目。", h_viewall:"查看全部 120 →",
     h_c1d:"坦桑尼亚北部 2,400 户小农的农林复合与土壤碳转型。",
     h_c2d:"哥伦比亚中型合作社水洗厂的废水甲烷回收与太阳能干燥。",
     h_c3d:"热泵烘焙厂改造，配套消费者订阅模式与开放碳账本。",
@@ -1569,6 +1580,25 @@
     g_kyc3:"制裁筛查——<b>上次运行 09:00 UTC</b>",
     ft_t:"ZCC 平台——演示界面。证券发行、基金管理与碳资产服务为独立法律实体。此处编制的碳披露是数据输入，不是合规意见。",
     v_t:"观看 3 分钟平台导览", v_s:"完整讲解全部功能与商业模式——以你的语言配音。",
+    d_count_all:"个项目 · 6 个环节 · 4 层资本", d_all_carbon:"全部碳类型", d_search:"搜索项目、国家或编号",
+    d_sort_prog:"按募资进度", d_sort_tonnes:"按碳量", d_sort_name:"按名称（A–Z）",
+    d_showing:"显示 {n} / {total} 个结果", d_more:"加载更多项目", d_none:"没有符合当前筛选条件的项目。",
+    pj_ret:"已注销", pj_inv_lbl:"位投资人", pj_min_lbl:"起投",
+    pr_t:"在门户中打开", pr_s:"同一个项目存在于五个控制台——选择你负责的那个。",
+    pr_founder:"创始人控制台", pr_founder_s:"募资、里程碑、动态发布",
+    pr_investor:"投资人交易室", pr_investor_s:"认购、持仓、文件",
+    pr_institution:"机构碳账本", pr_institution_s:"批次、分配、远期合约",
+    pr_vvb:"VVB 核查", pr_vvb_s:"待签核的批次",
+    pr_admin:"管理员监督", pr_admin_s:"合规与风控",
+    pr_locked:"该层级项目尚未开放此门户",
+    pj_note_p:"本页数字取自演示数据集。概览与资本叙事为本项目的示例内容。",
+    ctx_t:"正在处理", ctx_open:"查看项目",
+    dz_farm:"{place} 的农林复合与土壤碳转型——{metric}。",
+    dz_process:"{place} 的加工端甲烷回收与能效改造——{metric}。",
+    dz_roast:"{place} 的烘焙厂电气化与热回收——{metric}。",
+    dz_pack:"{place} 的可循环与低碳包装系统——{metric}。",
+    dz_log:"从 {place} 出发的绿色货运与冷链整合——{metric}。",
+    dz_cafe:"{place} 的门店制冷剂与能源改造计划——{metric}。",
     t_regen:"再生农业", t_removal:"清除", t_process:"加工", t_avoid:"避免", t_roast:"烘焙厂", t_inset:"内嵌消减",
     t_farm:"种植", t_roasting:"烘焙", t_pack:"包装", t_log:"物流", t_cafe:"咖啡馆",
     t_scope3:"Scope 3 内嵌消减", t_offset:"注销抵消", t_held:"持有", t_avail:"可用",
@@ -1596,7 +1626,7 @@
     h_l2n:"الطبقة 02", h_l2t:"تمويل المجتمع", h_l2p:"إصدار بنمط Reg CF وشركات SPV. يشترك المعجبون والداعمون المحليون عبر حساب ضمان، ويُموَّل عند الإغلاق فقط.",
     h_l3n:"الطبقة 03", h_l3t:"رأس المال المؤسسي", h_l3p:"صناديق بنمط Jebi Capital، وغرف بيانات، وطلبات رأس مال، وشلالات carry، وتوزيع عند الخروج.",
     h_l4n:"الطبقة 04", h_l4t:"حقوق الكربون", h_l4p:"قياس وتحقق وإبلاغ (MRV)، وتحقق VVB، وإصدار السجل، وتخصيص الاستحقاق، والإبطال وحزم الإفصاح.",
-    h_ft:"مشاريع مميزة", h_fs:"مشاريع جارية عبر طبقات رأس المال الثلاث.", h_viewall:"عرض الكل 142 →",
+    h_ft:"مشاريع مميزة", h_fs:"مشاريع جارية عبر طبقات رأس المال الثلاث.", h_viewall:"عرض الكل 120 →",
     h_c1d:"التحول إلى الزراعة الحرجية والكربون العضوي عبر 2,400 مزرعة صغيرة في شمال تنزانيا.",
     h_c2d:"استرجاع الميثان من مياه الصرف والتجفيف الشمسي لمطحن مائي تعاوني متوسط في كولومبيا.",
     h_c3d:"تحويل محمصة إلى مضخات حرارية مع نموذج اشتراك للمستهلكين وسجل كربون مفتوح.",
@@ -1795,6 +1825,25 @@
     g_kyc3:"فرز العقوبات — <b>آخر تشغيل 09:00 UTC</b>",
     ft_t:"منصة ZCC — واجهة عرض. إصدار الأوراق المالية وإدارة الصناديق وخدمات أصول الكربون كيانات قانونية منفصلة. إفصاحات الكربون المعدة هنا مدخلات بيانات، لا آراء امتثال.",
     v_t:"شاهد جولة المنصة في 3 دقائق", v_s:"شرح كامل لكل المزايا ونموذج العمل — بتعليق صوتي بلغتك.",
+    d_count_all:"مشروعًا · 6 قطاعات · 4 طبقات رأس مال", d_all_carbon:"كل أنواع الكربون", d_search:"ابحث عن مشروع أو دولة أو معرّف",
+    d_sort_prog:"حسب تقدم التمويل", d_sort_tonnes:"حسب حجم الكربون", d_sort_name:"حسب الاسم (A–Z)",
+    d_showing:"عرض {n} من {total}", d_more:"عرض المزيد", d_none:"لا توجد مشاريع مطابقة لهذه الفلاتر.",
+    pj_ret:"مرتد", pj_inv_lbl:"مستثمرًا", pj_min_lbl:"الحد الأدنى",
+    pr_t:"افتح في بوابة", pr_s:"المشروع نفسه موجود في الوحدات الخمس — اختر ما تديره.",
+    pr_founder:"وحدة المؤسس", pr_founder_s:"التمويل والمراحل والتحديثات",
+    pr_investor:"غرفة صفقات المستثمر", pr_investor_s:"الاكتتاب والمراكز والمستندات",
+    pr_institution:"سجل الكربون المؤسسي", pr_institution_s:"الدفعات والتخصيصات والعقود الآجلة",
+    pr_vvb:"تحقق VVB", pr_vvb_s:"دفعات بانتظار التوقيع",
+    pr_admin:"إشراف المشرف", pr_admin_s:"الامتثال والضوابط",
+    pr_locked:"هذه البوابة غير متاحة لهذه الطبقة بعد",
+    pj_note_p:"الأرقام في هذه الصفحة من مجموعة بيانات عرض. النظرة العامة والسرد الرأسمالي توضيحيان لهذا المشروع.",
+    ctx_t:"تعمل على", ctx_open:"فتح المشروع",
+    dz_farm:"تحول زراعي حرجي وكربون التربة في {place} — {metric}.",
+    dz_process:"التقاط الميثان وتحسين الطاقة في جانب المعالجة في {place} — {metric}.",
+    dz_roast:"كهربة المحمصة واسترداد الحرارة في {place} — {metric}.",
+    dz_pack:"نظام تغليف قابل لإعادة الاستخدام ومنخفض الكربون في {place} — {metric}.",
+    dz_log:"تجميع الشحن الأخضر وسلسلة التبريد من {place} — {metric}.",
+    dz_cafe:"برنامج تبريد وطاقة على مستوى المقاهي في {place} — {metric}.",
     t_regen:"تجديدية", t_removal:"إزالة", t_process:"معالجة", t_avoid:"تفادي", t_roast:"محمصة", t_inset:"خفض داخلي",
     t_farm:"الزراعة", t_roasting:"التحميص", t_pack:"التغليف", t_log:"اللوجستيات", t_cafe:"المقاهي",
     t_scope3:"خفض ضمن النطاق 3", t_offset:"إبطال تعويض", t_held:"محتفظ به", t_avail:"متاح",
@@ -1809,6 +1858,7 @@
   };
 
   var LANG_LABEL = { en: "EN", zh: "中文", ar: "ع" };
+  window.ZCC_I18N = I18N;
 
   function setLang(lang) {
     var dict = I18N[lang];
@@ -1856,6 +1906,9 @@
   }
 })();
 </script>
+<script src="assets/js/projects-data.js"></script>
+<script src="assets/js/discover.js"></script>
+<script src="assets/js/zcc-detail.js"></script>
 <script>
 /* ---- intro video language switcher: auto-follows site language, manual chips override ---- */
 (function () {
