@@ -329,6 +329,24 @@
     <div class="card stat"><div class="n" style="color:var(--up)">61,800</div><div class="l" data-i18n="h_s4">tCO₂e retired</div></div>
   </div>
 
+  <div class="card" id="video-section" style="margin:38px 0 8px;padding:26px 26px 22px">
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:16px">
+      <div>
+        <h3 style="margin-bottom:4px" data-i18n="v_t">Watch the 3-minute platform tour</h3>
+        <p class="small muted" style="margin:0" data-i18n="v_s">Full walkthrough of every feature and the business model — narrated in your language.</p>
+      </div>
+      <div id="vlangdd" style="display:flex;gap:8px;flex-wrap:wrap">
+        <button type="button" class="chip vlang on" data-vlang="en" style="cursor:pointer">English</button>
+        <button type="button" class="chip vlang" data-vlang="zh" style="cursor:pointer">中文</button>
+        <button type="button" class="chip vlang" data-vlang="ar" style="cursor:pointer">العربية</button>
+      </div>
+    </div>
+    <video id="intro-video" controls preload="metadata" playsinline poster="assets/video/poster.png"
+      style="width:100%;aspect-ratio:16/9;border-radius:12px;background:#000;display:block">
+      <source id="intro-src" src="assets/video/zcc_intro_en.mp4" type="video/mp4">
+    </video>
+  </div>
+
   <div class="divider"></div>
 
   <h2 data-i18n="h_stack_t">The four-layer capital stack</h2>
@@ -1550,6 +1568,7 @@
     g_kyc2:"机构 EDD——<b>2 审核中</b>",
     g_kyc3:"制裁筛查——<b>上次运行 09:00 UTC</b>",
     ft_t:"ZCC 平台——演示界面。证券发行、基金管理与碳资产服务为独立法律实体。此处编制的碳披露是数据输入，不是合规意见。",
+    v_t:"观看 3 分钟平台导览", v_s:"完整讲解全部功能与商业模式——以你的语言配音。",
     t_regen:"再生农业", t_removal:"清除", t_process:"加工", t_avoid:"避免", t_roast:"烘焙厂", t_inset:"内嵌消减",
     t_farm:"种植", t_roasting:"烘焙", t_pack:"包装", t_log:"物流", t_cafe:"咖啡馆",
     t_scope3:"Scope 3 内嵌消减", t_offset:"注销抵消", t_held:"持有", t_avail:"可用",
@@ -1775,6 +1794,7 @@
     g_kyc2:"العناية الواجبة المعززة المؤسسية — <b>2 قيد المراجعة</b>",
     g_kyc3:"فرز العقوبات — <b>آخر تشغيل 09:00 UTC</b>",
     ft_t:"منصة ZCC — واجهة عرض. إصدار الأوراق المالية وإدارة الصناديق وخدمات أصول الكربون كيانات قانونية منفصلة. إفصاحات الكربون المعدة هنا مدخلات بيانات، لا آراء امتثال.",
+    v_t:"شاهد جولة المنصة في 3 دقائق", v_s:"شرح كامل لكل المزايا ونموذج العمل — بتعليق صوتي بلغتك.",
     t_regen:"تجديدية", t_removal:"إزالة", t_process:"معالجة", t_avoid:"تفادي", t_roast:"محمصة", t_inset:"خفض داخلي",
     t_farm:"الزراعة", t_roasting:"التحميص", t_pack:"التغليف", t_log:"اللوجستيات", t_cafe:"المقاهي",
     t_scope3:"خفض ضمن النطاق 3", t_offset:"إبطال تعويض", t_held:"محتفظ به", t_avail:"متاح",
@@ -1834,6 +1854,48 @@
   } else {
     setLang(saved);
   }
+})();
+</script>
+<script>
+/* ---- intro video language switcher: auto-follows site language, manual chips override ---- */
+(function () {
+  var video = document.getElementById("intro-video");
+  var src = document.getElementById("intro-src");
+  var chips = document.querySelectorAll("#vlangdd .vlang");
+  function mark(l) {
+    for (var i = 0; i < chips.length; i++)
+      chips[i].classList.toggle("on", chips[i].getAttribute("data-vlang") === l);
+  }
+  function setVideoLang(l, keepTime) {
+    var t = "assets/video/zcc_intro_" + l + ".mp4";
+    if (!video || src.getAttribute("src") === t) { mark(l); return; }
+    var wasPlaying = !video.paused && !video.ended && video.currentTime > 0;
+    var time = video.currentTime;
+    src.setAttribute("src", t);
+    video.load();
+    if (keepTime && wasPlaying) {
+      video.addEventListener("loadedmetadata", function h() {
+        video.removeEventListener("loadedmetadata", h);
+        video.currentTime = Math.min(time, video.duration - 0.1);
+        video.play().catch(function () {});
+      });
+    }
+    mark(l);
+  }
+  window.setVideoLang = setVideoLang;
+  for (var i = 0; i < chips.length; i++) {
+    chips[i].addEventListener("click", function () {
+      setVideoLang(this.getAttribute("data-vlang"), true);
+    });
+  }
+  window.addEventListener("langchange", function () {
+    var l = "en";
+    try { l = localStorage.getItem("zcc_lang") || "en"; } catch (e) {}
+    setVideoLang(l, false);
+  });
+  var cur = "en";
+  try { cur = localStorage.getItem("zcc_lang") || "en"; } catch (e) {}
+  mark(cur);
 })();
 </script>
 </body>
